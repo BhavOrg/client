@@ -1,0 +1,34 @@
+{
+  "name": "bhava-client",
+  "version": "1.0.0",
+  "description": "Bhav is for anonymous mental health support and professional connections. Built with React.js, focusing on user privacy and secure communication.",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@typescript-eslint/parser": "^8.22.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "vite": "^6.0.11"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,ts}\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
