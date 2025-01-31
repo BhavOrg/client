@@ -128,3 +128,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Project specific setting
+.vscode
+
+# Hidden file created by macos
+.DS_Store

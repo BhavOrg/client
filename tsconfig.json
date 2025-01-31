@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "moduleResolution": "Node", // This helps resolving imports correctly
+    "esModuleInterop": true, // This will enable default import for CommonJS
+    "strict": true,
+    "skipLibCheck": true, // This avoids unnecessary type checking in node_modules
+    "forceConsistentCasingInFileNames": true // This prevents issues on case-sensitive OS
+  },
+  "include": ["src"], // This ensure TypeScript only check `src` folder
+  "exclude": ["node_modules"]
+}
