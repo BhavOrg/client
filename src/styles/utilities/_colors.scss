@@ -1,0 +1,32 @@
+@use "../abstracts/variables" as *;
+
+// Background color 
+.bg-primary { background-color: $primary; }
+.bg-secondary { background-color: $secondary; }
+.bg-accent { background-color: $accent; }
+.bg-surface { background-color: $surface-color; }
+.bg-background { background-color: $background-color; }
+.bg-neutral-light { background-color: $neutral-light; }
+.bg-neutral-mid { background-color: $neutral-mid; }
+.bg-neutral-dark { background-color: $neutral-dark; }
+.bg-success { background-color: $success; }
+.bg-warning { background-color: $warning; }
+.bg-error { background-color: $error; }
+
+// Text Color 
+.text-primary { color: $primary; }
+.text-secondary { color: $secondary; }
+.text-accent { color: $accent; }
+.text-default { color: $text-color; }
+.text-light { color: $surface-color; }
+.text-neutral-mid { color: $neutral-mid; }
+.text-success { color: $success; }
+.text-warning { color: $warning; }
+.text-error { color: $error; }
+
+// Border color
+.border-primary { border-color: $primary; }
+.border-secondary { border-color: $secondary; }
+.border-accent { border-color: $accent; }
+.border-default { border-color: $border-color; }
+.border-neutral-light { border-color: $neutral-light; }
