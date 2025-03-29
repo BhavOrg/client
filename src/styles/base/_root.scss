@@ -1,24 +1,24 @@
 @use "../abstracts/variables" as *;
 
 :root {
-    // Brand Colors
-    --primary: #{$primary};
-    --secondary: #{$secondary};
-    --accent: #{$accent};
+  // Brand Colors
+  --primary: #{$primary};
+  --secondary: #{$secondary};
+  --accent: #{$accent};
 
-    // Text and Background
-    --text-color: #{$text-color};
-    --background-color: #{$background-color};
-    --surface-color: #{$surface-color};
-    --border-color: #{$border-color};
+  // Text and Background Colors
+  --text-color: #{$text-color};
+  --background-color: #{$background-color};
+  --surface-color: #{$surface-color};
+  --border-color: #{$border-color};
 
-    // Extended Neutrals
-    --neutral-dark: #{$neutral-dark};
-    --neutral-mid: #{$neutral-mid};
-    --neutral-light: #{$neutral-light};
+  // Extended Neutrals Colors
+  --neutral-dark: #{$neutral-dark};
+  --neutral-mid: #{$neutral-mid};
+  --neutral-light: #{$neutral-light};
 
-    // Alerts and State
-    --success: #{$success};
-    --warning: #{$warning};
-    --error: #{$error};
+  // Alerts and State Color
+  --success: #{$success};
+  --warning: #{$warning};
+  --error: #{$error};
 }
