@@ -13,6 +13,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn = false }) => {
       <div className={styles.header__background}>
         <div className={styles.header__shape_left}></div>
         <div className={styles.header__shape_right}></div>
+        <div className={styles.header__overlay}></div>
       </div>
       <div className={styles.header__content}>
         <Navbar isLoggedIn={isLoggedIn} />

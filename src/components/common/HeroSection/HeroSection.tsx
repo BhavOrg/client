@@ -6,19 +6,36 @@ const HeroSection: React.FC = () => {
     <div className={styles.hero}>
       <div className={styles.hero__content}>
         <h1 className={styles.hero__title}>
-          If you need someone to talk to,
+          Heal in community,
           <br />
-          you're at the right place
+          stay in anonymity
         </h1>
         <p className={styles.hero__subtitle}>
-          Share feelings anonymously, be a part of interesting groups,
-          <br />
-          and connect with like-minded people
+          A safe space where your thoughts can breathe freely, your struggles
+          find understanding, and professional guidance meets you where you
+          are—without ever compromising your privacy.
         </p>
         <div className={styles.hero__cta}>
           <button className={styles.hero__button}>
-            Get Started <span className={styles.hero__button_arrow}>→</span>
+            Begin Your Journey{" "}
+            <span className={styles.hero__button_arrow}>→</span>
           </button>
+        </div>
+        <div className={styles.hero__features}>
+          <div className={styles.hero__feature}>
+            <span className={styles.hero__feature_icon}>🔒</span>
+            <span className={styles.hero__feature_text}>
+              Complete Anonymity
+            </span>
+          </div>
+          <div className={styles.hero__feature}>
+            <span className={styles.hero__feature_icon}>👥</span>
+            <span className={styles.hero__feature_text}>Community Support</span>
+          </div>
+          <div className={styles.hero__feature}>
+            <span className={styles.hero__feature_icon}>👨‍⚕️</span>
+            <span className={styles.hero__feature_text}>Expert Guidance</span>
+          </div>
         </div>
       </div>
     </div>

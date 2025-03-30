@@ -1,5 +1,6 @@
 @use "../../../styles/variables" as *;
 @use "../../../styles/mixins" as *;
+@use "sass:color";
 
 .header {
   position: relative;
@@ -13,53 +14,120 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background-color: #fdf3f0;
+    background-color: #f9f5ff;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0) 70%
+    );
+    z-index: 0;
   }
 
   &__shape_left {
     position: absolute;
-    width: 60rem;
-    height: 60rem;
+    width: 70rem;
+    height: 70rem;
     border-radius: 50%;
-    background-color: $primary;
-    top: -20rem;
-    left: -20rem;
-    opacity: 0.9;
+    background: linear-gradient(
+      135deg,
+      color.adjust($primary, $lightness: 10%),
+      $primary
+    );
+    top: -30rem;
+    left: -30rem;
+    opacity: 0.85;
+    filter: blur(30px);
+    animation: float 15s infinite alternate ease-in-out;
 
     @include media-breakpoint-down(md) {
+      width: 50rem;
+      height: 50rem;
+      top: -25rem;
+      left: -25rem;
+    }
+
+    @include media-breakpoint-down(sm) {
       width: 40rem;
       height: 40rem;
-      top: -15rem;
-      left: -15rem;
+      top: -20rem;
+      left: -20rem;
     }
   }
 
   &__shape_right {
     position: absolute;
-    width: 60rem;
-    height: 60rem;
+    width: 70rem;
+    height: 70rem;
     border-radius: 50%;
-    background-color: $secondary;
-    bottom: -20rem;
-    right: -20rem;
-    opacity: 0.8;
+    background: linear-gradient(
+      135deg,
+      $secondary,
+      color.adjust($secondary, $lightness: -15%)
+    );
+    bottom: -35rem;
+    right: -35rem;
+    opacity: 0.85;
+    filter: blur(30px);
+    animation: float 18s infinite alternate-reverse ease-in-out;
 
     @include media-breakpoint-down(md) {
+      width: 50rem;
+      height: 50rem;
+      bottom: -25rem;
+      right: -25rem;
+    }
+
+    @include media-breakpoint-down(sm) {
       width: 40rem;
       height: 40rem;
-      bottom: -15rem;
-      right: -15rem;
+      bottom: -20rem;
+      right: -20rem;
     }
   }
 
   &__content {
     position: relative;
-    z-index: 1;
-    padding: $space-3 0;
+    z-index: 2;
+    padding: $space-3 $space-4;
     max-width: 120rem;
     margin: 0 auto;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+
+    @include media-breakpoint-down(md) {
+      padding: $space-2 $space-3;
+    }
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1);
   }
 }
