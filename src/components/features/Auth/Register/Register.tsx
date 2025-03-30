@@ -7,7 +7,7 @@ import {
   FaExclamationTriangle,
   FaArrowLeft,
 } from "react-icons/fa";
-import Modal from "../../..//common/Modal/Modal";
+import Modal from "../../../common/Modal/Modal";
 import Input from "../../../common/Input/Input";
 import Button from "../../../common/Button/Button";
 import styles from "./Register.module.scss";
@@ -38,6 +38,8 @@ const Register: React.FC<RegisterProps> = ({
   onLoginClick,
 }) => {
   const { register } = useAuth();
+
+  // Form state
   const [formData, setFormData] = useState<RegisterFormData>({
     username: "",
     password: "",
@@ -48,13 +50,23 @@ const Register: React.FC<RegisterProps> = ({
   const [currentStep, setCurrentStep] = useState<
     "form" | "passphrase" | "verification"
   >("form");
+
+  // Passphrase state
   const [passphrase, setPassphrase] = useState<string[]>([]);
-  const [verificationInput, setVerificationInput] = useState<string>("");
-  const [isVerifying, setIsVerifying] = useState(false);
   const [isPassphraseCopied, setIsPassphraseCopied] = useState(false);
+
+  // Verification state
+  const [verificationInput, setVerificationInput] = useState<string>("");
+  const [verificationWords, setVerificationWords] = useState<string[]>(
+    Array(12).fill(""),
+  );
+  const [isVerifying, setIsVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(
     null,
   );
+
+  // Input refs - moved to top level
+  const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(12).fill(null));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -107,7 +119,6 @@ const Register: React.FC<RegisterProps> = ({
     setIsLoading(true);
 
     try {
-      // Now we're using register that was extracted at the component level
       const response = await register(formData.username, formData.password);
 
       if (response.data.passphrase) {
@@ -145,17 +156,117 @@ const Register: React.FC<RegisterProps> = ({
     setVerificationError(null);
   };
 
+  // Word input handlers for verification step - moved to component level
+  const handleWordChange = (index: number, value: string) => {
+    // Check if a space was entered (which would indicate finishing a word)
+    const containsSpace = value.includes(" ");
+
+    // If space is detected, split the value and move the extra content to next input
+    if (containsSpace) {
+      const parts = value.split(/\s+/).filter(Boolean);
+      if (parts.length > 0) {
+        // Update current word
+        const newWords = [...verificationWords];
+        newWords[index] = parts[0].trim().toLowerCase();
+
+        // If there are additional words and we're not at the last box,
+        // move them to the next box(es)
+        if (parts.length > 1 && index < 11) {
+          // Place the second word in the next box
+          newWords[index + 1] = parts[1].trim().toLowerCase();
+
+          // Update the state
+          setVerificationWords(newWords);
+
+          // Focus the next box
+          setTimeout(() => {
+            inputRefs.current[index + 1]?.focus();
+          }, 0);
+          return;
+        }
+
+        setVerificationWords(newWords);
+      }
+    } else {
+      // Regular update without auto-moving to the next field
+      const newWords = [...verificationWords];
+      newWords[index] = value.trim().toLowerCase();
+      setVerificationWords(newWords);
+    }
+
+    // Clear error when user types
+    if (verificationError) setVerificationError(null);
+  };
+
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    // Handle backspace on empty input to go back to previous input
+    if (e.key === "Backspace" && !verificationWords[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+
+    // Handle right arrow to move to next input
+    if (e.key === "ArrowRight" && index < 11) {
+      inputRefs.current[index + 1]?.focus();
+    }
+
+    // Handle left arrow to move to previous input
+    if (e.key === "ArrowLeft" && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData("text");
+    const words = pastedText.trim().toLowerCase().split(/\s+/);
+
+    // Only use first 12 words if more were pasted
+    const validWords = words.slice(0, 12);
+
+    // Fill in as many words as possible
+    const newWords = [...verificationWords];
+    validWords.forEach((word, index) => {
+      if (index < 12) {
+        newWords[index] = word;
+      }
+    });
+
+    setVerificationWords(newWords);
+
+    // Focus the next empty input or the last one if all filled
+    const nextEmptyIndex = newWords.findIndex((word) => !word);
+    if (nextEmptyIndex !== -1) {
+      inputRefs.current[nextEmptyIndex]?.focus();
+    } else {
+      inputRefs.current[11]?.focus();
+    }
+  };
+
+  // Helper function for setting refs
+  const setInputRef = (index: number) => (el: HTMLInputElement | null) => {
+    inputRefs.current[index] = el;
+  };
+
   const handleVerificationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if any word is empty
+    if (verificationWords.some((word) => !word)) {
+      setVerificationError("Please enter all 12 words of your passphrase.");
+      return;
+    }
+
     setIsVerifying(true);
 
-    // Check if verification matches passphrase
-    const isCorrect =
-      verificationInput.trim().toLowerCase() ===
-      passphrase.join(" ").toLowerCase();
+    // Join the words with spaces and check against the original passphrase
+    const enteredPassphrase = verificationWords.join(" ").toLowerCase();
+    const originalPassphrase = passphrase.join(" ").toLowerCase();
 
     setTimeout(() => {
-      if (isCorrect) {
+      if (enteredPassphrase === originalPassphrase) {
         // Registration complete
         onClose();
         // In a real app, you'd also handle login here
@@ -274,7 +385,7 @@ const Register: React.FC<RegisterProps> = ({
         <div className={styles.passphraseWords}>
           {passphrase.map((word, index) => (
             <div key={index} className={styles.passphraseWord}>
-              <span className={styles.wordNumber}>{index + 1}</span>
+              <span className={styles.wordNumberRegister}>{index + 1}</span>
               <span className={styles.word}>{word}</span>
             </div>
           ))}
@@ -310,207 +421,71 @@ const Register: React.FC<RegisterProps> = ({
     </div>
   );
 
-  // This is a partial code snippet to replace the renderVerificationStep function in Register.tsx
-
-  const renderVerificationStep = () => {
-    // Create an array of refs for the 12 input boxes
-    const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(12).fill(null));
-
-    // State for individual words
-    const [verificationWords, setVerificationWords] = useState<string[]>(
-      Array(12).fill(""),
-    );
-
-    // For Register.tsx (inside renderVerificationStep)
-    const handleWordChange = (index: number, value: string) => {
-      // Check if a space was entered (which would indicate finishing a word)
-      const containsSpace = value.includes(" ");
-
-      // If space is detected, split the value and move the extra content to next input
-      if (containsSpace) {
-        const parts = value.split(/\s+/).filter(Boolean);
-        if (parts.length > 0) {
-          // Update current word
-          const newWords = [...verificationWords];
-          newWords[index] = parts[0].trim().toLowerCase();
-
-          // If there are additional words and we're not at the last box,
-          // move them to the next box(es)
-          if (parts.length > 1 && index < 11) {
-            // Place the second word in the next box
-            newWords[index + 1] = parts[1].trim().toLowerCase();
-
-            // Update the state
-            setVerificationWords(newWords);
-
-            // Focus the next box
-            setTimeout(() => {
-              inputRefs.current[index + 1]?.focus();
-            }, 0);
-            return;
-          }
-
-          setVerificationWords(newWords);
-        }
-      } else {
-        // Regular update without auto-moving to the next field
-        const newWords = [...verificationWords];
-        newWords[index] = value.trim().toLowerCase();
-        setVerificationWords(newWords);
-      }
-
-      // Clear error when user types
-      if (verificationError) setVerificationError(null);
-    };
-
-    // Enhanced handleKeyDown for Register verification
-    const handleKeyDown = (
-      index: number,
-      e: React.KeyboardEvent<HTMLInputElement>,
-    ) => {
-      // Handle backspace on empty input to go back to previous input
-      if (e.key === "Backspace" && !verificationWords[index] && index > 0) {
-        inputRefs.current[index - 1]?.focus();
-      }
-
-      // Handle right arrow to move to next input
-      if (e.key === "ArrowRight" && index < 11) {
-        inputRefs.current[index + 1]?.focus();
-      }
-
-      // Handle left arrow to move to previous input
-      if (e.key === "ArrowLeft" && index > 0) {
-        inputRefs.current[index - 1]?.focus();
-      }
-    };
-
-    const handlePaste = (e: React.ClipboardEvent) => {
-      e.preventDefault();
-      const pastedText = e.clipboardData.getData("text");
-      const words = pastedText.trim().toLowerCase().split(/\s+/);
-
-      // Only use first 12 words if more were pasted
-      const validWords = words.slice(0, 12);
-
-      // Fill in as many words as possible
-      const newWords = [...verificationWords];
-      validWords.forEach((word, index) => {
-        if (index < 12) {
-          newWords[index] = word;
-        }
-      });
-
-      setVerificationWords(newWords);
-
-      // Focus the next empty input or the last one if all filled
-      const nextEmptyIndex = newWords.findIndex((word) => !word);
-      if (nextEmptyIndex !== -1) {
-        inputRefs.current[nextEmptyIndex]?.focus();
-      } else {
-        inputRefs.current[11]?.focus();
-      }
-    };
-
-    // Create a function to set refs properly
-    const setInputRef = (index: number) => (el: HTMLInputElement | null) => {
-      inputRefs.current[index] = el;
-    };
-
-    const handleVerificationSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-
-      // Check if any word is empty
-      if (verificationWords.some((word) => !word)) {
-        setVerificationError("Please enter all 12 words of your passphrase.");
-        return;
-      }
-
-      setIsVerifying(true);
-
-      // Join the words with spaces and check against the original passphrase
-      const enteredPassphrase = verificationWords.join(" ").toLowerCase();
-      const originalPassphrase = passphrase.join(" ").toLowerCase();
-
-      setTimeout(() => {
-        if (enteredPassphrase === originalPassphrase) {
-          // Registration complete
-          onClose();
-          // In a real app, you'd also handle login here
-        } else {
-          setVerificationError(
-            "The passphrase you entered doesn't match. Please try again.",
-          );
-        }
-        setIsVerifying(false);
-      }, 1000);
-    };
-
-    return (
-      <form
-        onSubmit={handleVerificationSubmit}
-        className={styles.verificationForm}
+  const renderVerificationStep = () => (
+    <form
+      onSubmit={handleVerificationSubmit}
+      className={styles.verificationForm}
+    >
+      <button
+        type="button"
+        className={styles.backButton}
+        onClick={goBackToPassphrase}
       >
-        <button
-          type="button"
-          className={styles.backButton}
-          onClick={goBackToPassphrase}
-        >
-          <FaArrowLeft /> Back to Passphrase
-        </button>
+        <FaArrowLeft /> Back to Passphrase
+      </button>
 
-        <div className={styles.verificationHeader}>
-          <FaCheckCircle className={styles.verificationIcon} />
-          <h3>Verify Your Passphrase</h3>
+      <div className={styles.verificationHeader}>
+        <FaCheckCircle className={styles.verificationIcon} />
+        <h3>Verify Your Passphrase</h3>
+      </div>
+
+      <p className={styles.verificationInstructions}>
+        To ensure you've saved your passphrase correctly, please enter all 12
+        words in the correct order.
+      </p>
+
+      <div className={styles.verificationInputContainer}>
+        <div className={styles.passphraseInputGrid}>
+          {verificationWords.map((word, index) => (
+            <div key={index} className={styles.wordInputContainer}>
+              <span className={styles.wordNumber}>{index + 1}</span>
+              <input
+                type="text"
+                value={word}
+                onChange={(e) => handleWordChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                onPaste={index === 0 ? handlePaste : undefined}
+                className={styles.wordInput}
+                placeholder={`Word ${index + 1}`}
+                ref={setInputRef(index)}
+                autoComplete="off"
+              />
+            </div>
+          ))}
         </div>
 
-        <p className={styles.verificationInstructions}>
-          To ensure you've saved your passphrase correctly, please enter all 12
-          words in the correct order.
-        </p>
+        {verificationError && (
+          <div className={styles.verificationError}>{verificationError}</div>
+        )}
 
-        <div className={styles.verificationInputContainer}>
-          <div className={styles.passphraseInputGrid}>
-            {verificationWords.map((word, index) => (
-              <div key={index} className={styles.wordInputContainer}>
-                <span className={styles.wordNumber}>{index + 1}</span>
-                <input
-                  type="text"
-                  value={word}
-                  onChange={(e) => handleWordChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={index === 0 ? handlePaste : undefined}
-                  className={styles.wordInput}
-                  placeholder={`Word ${index + 1}`}
-                  ref={setInputRef(index)}
-                  autoComplete="off"
-                />
-              </div>
-            ))}
-          </div>
-
-          {verificationError && (
-            <div className={styles.verificationError}>{verificationError}</div>
-          )}
-
-          <div className={styles.passphraseHelp}>
-            <p className={styles.smallTip}>
-              Tip: You can paste your entire passphrase into the first box.
-            </p>
-          </div>
+        <div className={styles.passphraseHelp}>
+          <p className={styles.smallTip}>
+            Tip: You can paste your entire passphrase into the first box.
+          </p>
         </div>
+      </div>
 
-        <Button
-          type="submit"
-          variant="primary"
-          fullWidth
-          isLoading={isVerifying}
-          loadingText="Verifying..."
-        >
-          Complete Registration
-        </Button>
-      </form>
-    );
-  };
+      <Button
+        type="submit"
+        variant="primary"
+        fullWidth
+        isLoading={isVerifying}
+        loadingText="Verifying..."
+      >
+        Complete Registration
+      </Button>
+    </form>
+  );
 
   const renderContent = () => {
     switch (currentStep) {

@@ -92,9 +92,14 @@ const AuthService = {
     username: string,
     password: string,
   ): Promise<AuthResponse> => {
+    // Gather complete device information
     const deviceInfo = {
       userAgent: navigator.userAgent,
       platform: navigator.platform,
+      screenResolution: `${window.screen.width}x${window.screen.height}`,
+      colorDepth: window.screen.colorDepth,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      language: navigator.language,
     };
 
     const response = await authAxios.post<AuthResponse>("/auth/login", {

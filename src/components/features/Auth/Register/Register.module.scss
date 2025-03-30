@@ -209,6 +209,24 @@
 }
 
 .wordNumber {
+  position: absolute;
+  left: $space-2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  background-color: $primary;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: $font-weight-semibold;
+  z-index: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
+}
+
+.wordNumberRegister {
   left: $space-2;
   display: flex;
   align-items: center;
