@@ -1,0 +1,82 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+@use "sass:color";
+
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: $space-3;
+
+  &__content {
+    max-width: 80rem;
+    margin: 0 auto;
+  }
+
+  &__title {
+    font-family: $font-decorative;
+    font-size: 4.2rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+    margin-bottom: $space-5;
+    color: $text-color;
+
+    @include media-breakpoint-down(md) {
+      font-size: 3.2rem;
+      margin-bottom: $space-4;
+    }
+
+    @include media-breakpoint-down(sm) {
+      font-size: 2.8rem;
+    }
+  }
+
+  &__subtitle {
+    font-size: 1.8rem;
+    line-height: 1.6;
+    margin-bottom: $space-7;
+    color: $neutral-dark;
+
+    @include media-breakpoint-down(md) {
+      font-size: 1.6rem;
+      margin-bottom: $space-5;
+    }
+  }
+
+  &__button {
+    background-color: $secondary;
+    color: white;
+    border: none;
+    border-radius: $border-radius-lg;
+    padding: $space-3 $space-5;
+    font-size: 1.8rem;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+
+    &:hover {
+      background-color: color.adjust($secondary, $lightness: -5%);
+      transform: translateY(-2px);
+    }
+
+    &_arrow {
+      margin-left: $space-2;
+      font-size: 2rem;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover &_arrow {
+      transform: translateX(5px);
+    }
+
+    @include media-breakpoint-down(sm) {
+      padding: $space-2 $space-4;
+      font-size: 1.6rem;
+    }
+  }
+}

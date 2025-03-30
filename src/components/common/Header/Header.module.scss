@@ -1,0 +1,65 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.header {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background-color: #fdf3f0;
+  }
+
+  &__shape_left {
+    position: absolute;
+    width: 60rem;
+    height: 60rem;
+    border-radius: 50%;
+    background-color: $primary;
+    top: -20rem;
+    left: -20rem;
+    opacity: 0.9;
+
+    @include media-breakpoint-down(md) {
+      width: 40rem;
+      height: 40rem;
+      top: -15rem;
+      left: -15rem;
+    }
+  }
+
+  &__shape_right {
+    position: absolute;
+    width: 60rem;
+    height: 60rem;
+    border-radius: 50%;
+    background-color: $secondary;
+    bottom: -20rem;
+    right: -20rem;
+    opacity: 0.8;
+
+    @include media-breakpoint-down(md) {
+      width: 40rem;
+      height: 40rem;
+      bottom: -15rem;
+      right: -15rem;
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    padding: $space-3 0;
+    max-width: 120rem;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+}

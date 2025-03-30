@@ -1,0 +1,363 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+@use "sass:color";
+
+.navbarWrapper {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  border-radius: 0.8rem;
+  background-color: rgba($surface-color, 0.97);
+  padding: $space-3 0;
+  @include shadow-md;
+
+  @include media-breakpoint-down(md) {
+    padding: $space-2 0;
+    width: 96%;
+    margin: 0 auto;
+  }
+}
+
+.navbar {
+  /* Not using grid anymore */
+  align-items: center;
+  position: relative;
+  padding: 0 $space-3;
+  display: flex;
+  align-content: center;
+  justify-content: space-between;
+
+  @include media-breakpoint-down(lg) {
+    flex-wrap: wrap;
+  }
+
+  &__toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $text-color;
+    z-index: 101;
+
+    @include media-breakpoint-down(lg) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 4rem;
+      height: 4rem;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+      order: 2;
+
+      &:hover {
+        background-color: $neutral-light;
+      }
+    }
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    z-index: 101;
+
+    @include media-breakpoint-down(lg) {
+      flex: 1;
+      order: 1;
+    }
+
+    &-img {
+      width: 4rem;
+      height: auto;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  &__menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @include media-breakpoint-down(lg) {
+      display: none;
+      width: 100%;
+      order: 3;
+
+      &.open {
+        display: block;
+        padding-top: $space-7;
+      }
+    }
+  }
+
+  &__menuItems {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-3;
+
+    @include media-breakpoint-down(lg) {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: $space-3;
+    }
+  }
+
+  &__auth {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: $space-3;
+
+    @include media-breakpoint-down(lg) {
+      display: none;
+      width: 100%;
+      justify-content: center;
+      margin-top: $space-5;
+      order: 4;
+
+      .open ~ & {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+
+  &__item {
+    position: relative;
+
+    &.active {
+      color: $primary;
+    }
+  }
+
+  &__link,
+  &__button {
+    color: $text-color;
+    font-size: 1.6rem;
+    font-weight: $font-weight-medium;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2;
+    border-radius: $border-radius-sm;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      color: $primary;
+    }
+
+    &.active {
+      color: $primary;
+      font-weight: $font-weight-semibold;
+    }
+
+    @include media-breakpoint-down(lg) {
+      font-size: 1.8rem;
+      padding: $space-3;
+      width: 100%;
+      border-radius: $border-radius-sm;
+
+      &:hover {
+        background-color: $neutral-light;
+      }
+    }
+  }
+
+  &__button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    margin-right: $space-1;
+
+    @include media-breakpoint-up(lg) {
+      display: none;
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 30rem;
+    background-color: $surface-color;
+    border-radius: $border-radius-sm;
+    padding: $space-3;
+    box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transform-origin: top center;
+    animation: fadeIn 0.2s ease;
+
+    @include media-breakpoint-down(lg) {
+      position: static;
+      width: 100%;
+      box-shadow: none;
+      padding: $space-2 0 $space-2 $space-4;
+      animation: none;
+    }
+  }
+
+  &__category {
+    margin-bottom: $space-3;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__categoryTitle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: $space-2;
+    border: none;
+    background: none;
+    font-weight: $font-weight-medium;
+    color: $neutral-dark;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover,
+    &.active {
+      color: $primary;
+    }
+  }
+
+  &__submenu {
+    padding: $space-2 0 $space-2 $space-3;
+    animation: fadeIn 0.2s ease;
+  }
+
+  &__submenuItem {
+    margin-bottom: $space-2;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__submenuLink {
+    display: block;
+    padding: $space-1 $space-2;
+    color: $text-color;
+    font-size: 1.5rem;
+    border-radius: $border-radius-sm;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: $primary;
+      background-color: $neutral-light;
+    }
+  }
+
+  &__chevron {
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+
+    &.rotated {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__authLink,
+  &__authBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+    padding: $space-2 $space-4;
+    font-size: 1.5rem;
+    font-weight: $font-weight-medium;
+    transition: all 0.2s ease;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+
+    @include media-breakpoint-down(lg) {
+      width: 100%;
+      padding: $space-3;
+    }
+  }
+
+  &__login {
+    color: $primary;
+    border: 1px solid $primary;
+    background-color: transparent;
+    border-radius: $border-radius-md;
+
+    &:hover {
+      background-color: $primary;
+      color: white;
+    }
+  }
+
+  &__register {
+    color: white;
+    background-color: $primary;
+    border-radius: $border-radius-md;
+
+    &:hover {
+      background-color: color.adjust($primary, $lightness: -5%);
+    }
+  }
+
+  &__profile {
+    color: $secondary;
+    border: 1px solid $secondary;
+    background-color: transparent;
+    border-radius: $border-radius-md;
+
+    &:hover {
+      background-color: $secondary;
+      color: white;
+    }
+  }
+
+  &__logout {
+    color: $neutral-dark;
+    border: 1px solid $neutral-dark;
+    background-color: transparent;
+    border-radius: $border-radius-md;
+
+    &:hover {
+      background-color: $neutral-dark;
+      color: white;
+    }
+  }
+
+  &__action {
+    color: $accent;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,120 @@
+@use "sass:map";
+@use "sass:color";
+@use "variables" as *;
+
+// Media query mixins
+@mixin media-breakpoint-up($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (min-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @error "Invalid breakpoint: #{$breakpoint}. Available breakpoints are: #{map.keys($breakpoints)}";
+  }
+}
+
+@mixin media-breakpoint-down($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (max-width: (map.get($breakpoints, $breakpoint) - 0.1px)) {
+      @content;
+    }
+  } @else {
+    @error "Invalid breakpoint: #{$breakpoint}. Available breakpoints are: #{map.keys($breakpoints)}";
+  }
+}
+
+// Flexbox helpers
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Button mixins
+@mixin button-primary {
+  display: inline-block;
+  padding: $space-3 $space-5;
+  background-color: $primary;
+  color: white;
+  border: none;
+  border-radius: $border-radius-lg;
+  font-weight: $font-weight-medium;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: color.adjust($primary, $lightness: -5%);
+  }
+
+  @include media-breakpoint-down(sm) {
+    padding: $space-2 $space-4;
+  }
+}
+
+@mixin button-secondary {
+  display: inline-block;
+  padding: $space-3 $space-5;
+  background-color: $secondary;
+  color: white;
+  border: none;
+  border-radius: $border-radius-lg;
+  font-weight: $font-weight-medium;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: color.adjust($secondary, $lightness: -5%);
+  }
+
+  @include media-breakpoint-down(sm) {
+    padding: $space-2 $space-4;
+  }
+}
+
+@mixin button-outline($color: $primary) {
+  display: inline-block;
+  padding: $space-3 $space-5;
+  background-color: transparent;
+  color: $color;
+  border: 1px solid $color;
+  border-radius: $border-radius-lg;
+  font-weight: $font-weight-medium;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: $color;
+    color: white;
+  }
+
+  @include media-breakpoint-down(sm) {
+    padding: $space-2 $space-4;
+  }
+}
+
+// Shadow effects
+@mixin shadow-sm {
+  box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
+}
+
+@mixin shadow-md {
+  box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+@mixin shadow-lg {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}

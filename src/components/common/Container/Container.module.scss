@@ -1,0 +1,40 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.container {
+  width: 100%;
+  padding-right: $space-3;
+  padding-left: $space-3;
+  margin-right: auto;
+  margin-left: auto;
+
+  @include media-breakpoint-up(sm) {
+    padding-right: $space-4;
+    padding-left: $space-4;
+  }
+
+  @include media-breakpoint-up(md) {
+    padding-right: $space-5;
+    padding-left: $space-5;
+  }
+}
+
+.fluid {
+  max-width: 100%;
+}
+
+.sm {
+  max-width: map-get($breakpoints, "sm");
+}
+
+.md {
+  max-width: map-get($breakpoints, "md");
+}
+
+.lg {
+  max-width: map-get($breakpoints, "lg");
+}
+
+.xl {
+  max-width: map-get($breakpoints, "xl");
+}
