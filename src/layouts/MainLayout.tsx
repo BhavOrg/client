@@ -5,9 +5,8 @@ const MainLayout = () => {
   return (
     <>
       <Header />
-      <main>
-        <Outlet /> {/* It will renders child components based on the route */}
-      </main>
+      <main></main>
+      <footer>{/* Footer content  */}</footer>
     </>
   );
 };

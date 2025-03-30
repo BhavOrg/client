@@ -1,0 +1,141 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+@use "sass:color";
+
+.passphraseForm {
+  width: 100%;
+}
+
+.infoBox {
+  background-color: color.adjust($secondary, $lightness: 35%);
+  border-left: 3px solid $secondary;
+  padding: $space-3;
+  border-radius: $border-radius-sm;
+  margin-bottom: $space-4;
+
+  p {
+    font-size: 1.5rem;
+    color: color.adjust($secondary, $lightness: -20%);
+    line-height: 1.5;
+  }
+}
+
+.formError {
+  background-color: color.adjust($error, $lightness: 35%);
+  color: $error;
+  padding: $space-3;
+  border-radius: $border-radius-md;
+  margin-bottom: $space-4;
+  font-size: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.passphraseContainer {
+  margin-bottom: $space-5;
+  width: 100%;
+}
+
+.passphraseLabel {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: $font-weight-medium;
+  margin-bottom: $space-2;
+  color: $neutral-dark;
+}
+
+.labelWithIcon {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}
+
+.passphraseInputGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-3;
+  margin-bottom: $space-3;
+
+  @include media-breakpoint-down(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.wordInputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.wordNumber {
+  position: absolute;
+  left: $space-1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  background-color: $primary;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: $font-weight-semibold;
+  z-index: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
+}
+
+.wordInput {
+  width: 100%;
+  padding: $space-2 $space-2 $space-2 $space-6;
+  font-size: 1.5rem;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  background-color: $neutral-light;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    background-color: color.adjust($neutral-light, $lightness: 3%);
+    @include shadow-sm;
+  }
+
+  &::placeholder {
+    color: $neutral-mid;
+    opacity: 0.7;
+    font-size: 1.3rem;
+  }
+}
+
+.passphraseHelp {
+  font-size: 1.4rem;
+  color: $neutral-dark;
+  margin-top: $space-2;
+
+  p {
+    margin-bottom: $space-1;
+  }
+
+  .smallTip {
+    font-size: 1.3rem;
+    color: $primary;
+    font-style: italic;
+  }
+}
+
+.formActions {
+  @include flex-column;
+  gap: $space-4;
+  margin-top: $space-5;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,5 +1,6 @@
 @use "../../../styles/variables" as *;
 @use "../../../styles/mixins" as *;
+@use "sass:map";
 
 .container {
   width: 100%;
@@ -24,17 +25,17 @@
 }
 
 .sm {
-  max-width: map-get($breakpoints, "sm");
+  max-width: map.get($breakpoints, "sm");
 }
 
 .md {
-  max-width: map-get($breakpoints, "md");
+  max-width: map.get($breakpoints, "md");
 }
 
 .lg {
-  max-width: map-get($breakpoints, "lg");
+  max-width: map.get($breakpoints, "lg");
 }
 
 .xl {
-  max-width: map-get($breakpoints, "xl");
+  max-width: map.get($breakpoints, "xl");
 }

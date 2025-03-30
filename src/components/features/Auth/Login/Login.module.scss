@@ -1,0 +1,107 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+@use "sass:color";
+
+.loginForm {
+  width: 100%;
+}
+
+.formError {
+  background-color: color.adjust($error, $lightness: 35%);
+  color: $error;
+  padding: $space-3;
+  border-radius: $border-radius-md;
+  margin-bottom: $space-4;
+  font-size: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.formActions {
+  @include flex-column;
+  gap: $space-4;
+  margin-top: $space-5;
+}
+
+.alternateActions {
+  @include flex-column;
+  gap: $space-3;
+  text-align: center;
+}
+
+.textLink {
+  background: none;
+  border: none;
+  color: $primary;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: $space-1;
+  font-weight: $font-weight-medium;
+
+  &:hover {
+    color: color.adjust($primary, $lightness: -10%);
+    text-decoration: underline;
+  }
+}
+
+.registerPrompt {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  margin-top: $space-2;
+
+  span {
+    color: $neutral-dark;
+    font-size: 1.5rem;
+  }
+
+  @include media-breakpoint-up(sm) {
+    flex-direction: row;
+    gap: $space-2;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.newDevicePrompt {
+  @include flex-column;
+  align-items: center;
+  text-align: center;
+  padding: $space-2 0;
+
+  h3 {
+    font-size: 2rem;
+    margin-bottom: $space-3;
+    color: $text-color;
+  }
+
+  p {
+    font-size: 1.6rem;
+    color: $neutral-dark;
+    margin-bottom: $space-5;
+    line-height: 1.5;
+  }
+}
+
+.promptIcon {
+  color: $warning;
+  margin-bottom: $space-4;
+}
+
+.promptActions {
+  @include flex-column;
+  gap: $space-3;
+  width: 100%;
+  margin-top: $space-2;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -86,6 +86,7 @@
 
 @mixin button-outline($color: $primary) {
   display: inline-block;
+  display: flex;
   padding: $space-3 $space-5;
   background-color: transparent;
   color: $color;

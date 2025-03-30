@@ -1,0 +1,100 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+@use "sass:color";
+
+.inputWrapper {
+  margin-bottom: $space-4;
+  width: 100%;
+}
+
+.label {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: $font-weight-medium;
+  margin-bottom: $space-2;
+  color: $neutral-dark;
+}
+
+.inputContainer {
+  position: relative;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  font-size: 1.6rem;
+  padding: $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  background-color: $neutral-light;
+  color: $text-color;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: $neutral-mid;
+    opacity: 0.8;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    background-color: color.adjust($neutral-light, $lightness: 3%);
+    @include shadow-sm;
+  }
+
+  &.withIcon {
+    padding-left: $space-7;
+  }
+
+  &.hasError {
+    border-color: $error;
+    background-color: color.adjust($error, $lightness: 38%);
+  }
+}
+
+.icon {
+  position: absolute;
+  left: $space-3;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $neutral-mid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.togglePassword {
+  position: absolute;
+  right: $space-3;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: $neutral-mid;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $text-color;
+  }
+}
+
+.error {
+  color: $error;
+  font-size: 1.4rem;
+  margin-top: $space-1;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

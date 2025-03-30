@@ -1,0 +1,88 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba($text-color, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background-color: $surface-color;
+  border-radius: $border-radius-md;
+  width: 100%;
+  max-width: 50rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  @include shadow-lg;
+  animation: slideIn 0.3s ease;
+  position: relative;
+
+  @include media-breakpoint-down(sm) {
+    width: 90%;
+    max-width: none;
+  }
+}
+
+.modalHeader {
+  @include flex-between;
+  padding: $space-4 $space-5;
+  border-bottom: 1px solid $border-color;
+}
+
+.modalTitle {
+  font-size: 2.2rem;
+  color: $text-color;
+  margin: 0;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 2.8rem;
+  line-height: 1;
+  color: $neutral-mid;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $error;
+  }
+}
+
+.modalContent {
+  padding: $space-5;
+
+  @include media-breakpoint-down(sm) {
+    padding: $space-4;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

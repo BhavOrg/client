@@ -7,3 +7,8 @@ declare module "*.svg" {
   const content: string;
   export default content;
 }
+
+declare module "../services/authService.ts" {
+  const AuthService: any;
+  export default AuthService;
+}
