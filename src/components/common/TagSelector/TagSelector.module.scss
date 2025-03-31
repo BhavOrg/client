@@ -1,0 +1,266 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+@use "sass:color";
+
+.tagSelector {
+  @include flex-column;
+  gap: $space-3;
+  width: 100%;
+}
+
+.selectedTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  padding-bottom: $space-2;
+}
+
+.tagPill {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  background-color: rgba($accent, 0.1);
+  color: $accent;
+  border-radius: $border-radius-md;
+  font-size: 1.4rem;
+  font-weight: $font-weight-medium;
+}
+
+.removeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: $accent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba($accent, 0.2);
+  }
+}
+
+.tagSearch {
+  position: relative;
+  width: 100%;
+}
+
+.searchInput {
+  position: relative;
+
+  input {
+    width: 100%;
+    padding: $space-2 $space-2 $space-2 $space-6;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-md;
+    font-size: 1.5rem;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $accent;
+      box-shadow: 0 0 0 2px rgba($accent, 0.1);
+    }
+
+    &:disabled {
+      background-color: $neutral-light;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: $space-2;
+  transform: translateY(-50%);
+  color: $neutral-mid;
+  font-size: 1.4rem;
+  z-index: 1;
+}
+
+.searchResults {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin-top: $space-1;
+  background-color: $surface-color;
+  border-radius: $border-radius-md;
+  border: 1px solid $border-color;
+  @include shadow-md;
+  overflow: hidden;
+  max-height: 30rem;
+  overflow-y: auto;
+}
+
+.loadingMessage,
+.noResults {
+  padding: $space-3;
+  text-align: center;
+  color: $neutral-dark;
+  font-size: 1.4rem;
+}
+
+.tagList {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tagOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-2 $space-3;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  text-align: left;
+  color: $text-color;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: $neutral-light;
+  }
+
+  &:disabled {
+    color: $neutral-mid;
+    cursor: not-allowed;
+  }
+
+  &.popularTag {
+    background-color: transparent;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-sm;
+    margin: $space-1;
+  }
+}
+
+.tagCount {
+  font-size: 1.2rem;
+  color: $neutral-mid;
+  margin-left: $space-1;
+}
+
+.createTagOption {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3;
+  background-color: rgba($primary, 0.05);
+  border: none;
+  width: 100%;
+  font-size: 1.4rem;
+  color: $primary;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($primary, 0.1);
+  }
+
+  &:disabled {
+    color: $neutral-mid;
+    background-color: $neutral-light;
+    cursor: not-allowed;
+  }
+}
+
+.createTagForm {
+  margin-top: $space-3;
+  padding: $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  @include flex-column;
+  gap: $space-3;
+  background-color: $surface-color;
+}
+
+.createTagInput {
+  width: 100%;
+  padding: $space-2;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  font-size: 1.5rem;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+}
+
+.createTagActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-2;
+}
+
+.cancelButton,
+.createButton {
+  padding: $space-2 $space-3;
+  border-radius: $border-radius-sm;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton {
+  background-color: transparent;
+  border: 1px solid $border-color;
+  color: $neutral-dark;
+
+  &:hover {
+    background-color: $neutral-light;
+  }
+}
+
+.createButton {
+  background-color: $primary;
+  color: white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background-color: color.adjust($primary, $lightness: -5%);
+  }
+
+  &:disabled {
+    background-color: $neutral-mid;
+    cursor: not-allowed;
+  }
+}
+
+.popularTags {
+  @include flex-column;
+  gap: $space-2;
+}
+
+.popularTagsHeader {
+  font-size: 1.4rem;
+  color: $neutral-dark;
+  font-weight: $font-weight-medium;
+}
+
+.popularTagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-1;
+}
+
+.maxTagsMessage {
+  font-size: 1.3rem;
+  color: $neutral-dark;
+  text-align: center;
+  padding: $space-2;
+  background-color: $neutral-light;
+  border-radius: $border-radius-sm;
+}

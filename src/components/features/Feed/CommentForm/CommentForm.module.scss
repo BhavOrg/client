@@ -1,0 +1,79 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+@use "sass:color";
+
+.commentForm {
+  @include flex-column;
+  gap: $space-3;
+  width: 100%;
+}
+
+.commentInput {
+  width: 100%;
+  padding: $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  font-family: $font-primary;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  resize: vertical;
+  background-color: $surface-color;
+  color: $text-color;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 2px rgba($primary, 0.1);
+  }
+
+  &::placeholder {
+    color: $neutral-mid;
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+}
+
+.submitButton,
+.cancelButton {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  border-radius: $border-radius-md;
+  font-size: 1.4rem;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submitButton {
+  background-color: $primary;
+  color: white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background-color: color.adjust($primary, $lightness: -5%);
+  }
+
+  &:disabled {
+    background-color: $neutral-mid;
+    cursor: not-allowed;
+  }
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: $neutral-dark;
+  border: 1px solid $border-color;
+
+  &:hover {
+    background-color: $neutral-light;
+  }
+}

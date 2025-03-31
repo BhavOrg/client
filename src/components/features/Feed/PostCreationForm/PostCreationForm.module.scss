@@ -1,0 +1,213 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.postForm {
+  @include flex-column;
+  gap: $space-4;
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $space-3;
+
+  @include media-breakpoint-down(sm) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.privacyToggle {
+  display: flex;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+}
+
+.privacyButton {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  border: none;
+  background-color: transparent;
+  color: $neutral-dark;
+  font-size: 1.4rem;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: $neutral-light;
+  }
+
+  &.active {
+    background-color: $neutral-light;
+    color: $text-color;
+    font-weight: $font-weight-semibold;
+  }
+
+  &:first-child {
+    border-right: 1px solid $border-color;
+  }
+}
+
+.triggerWarningToggle {
+  display: flex;
+  align-items: center;
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: $space-2;
+}
+
+.toggleCheckbox {
+  display: none;
+
+  &:checked + .toggleSwitch {
+    background-color: $warning;
+
+    &:before {
+      transform: translateX(18px);
+    }
+  }
+}
+
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  background-color: $neutral-mid;
+  border-radius: 20px;
+  transition: all 0.3s;
+
+  &:before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    background-color: white;
+    transition: all 0.3s;
+  }
+}
+
+.toggleText {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  font-size: 1.4rem;
+  color: $neutral-dark;
+
+  svg {
+    color: $warning;
+  }
+}
+
+.triggerWarningInput {
+  margin-top: -$space-2;
+}
+
+.contentArea {
+  position: relative;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 15rem;
+  padding: $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  font-family: $font-primary;
+  font-size: 1.6rem;
+  line-height: 1.6;
+  color: $text-color;
+  resize: vertical;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 2px rgba($primary, 0.2);
+  }
+
+  &::placeholder {
+    color: $neutral-mid;
+  }
+}
+
+.charCounter {
+  position: absolute;
+  bottom: $space-2;
+  right: $space-3;
+  font-size: 1.3rem;
+  color: $neutral-dark;
+
+  .warning {
+    color: $warning;
+  }
+}
+
+.tagsSection {
+  @include flex-column;
+  gap: $space-3;
+}
+
+.tagsHeader {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  color: $neutral-dark;
+  font-size: 1.5rem;
+
+  svg {
+    color: $accent;
+  }
+}
+
+.errorMessage {
+  padding: $space-3;
+  border-radius: $border-radius-sm;
+  background-color: rgba($error, 0.1);
+  border-left: 3px solid $error;
+
+  p {
+    color: $error;
+    font-size: 1.5rem;
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $space-2;
+
+  @include media-breakpoint-down(sm) {
+    justify-content: center;
+  }
+}
+
+.submitButton {
+  @include button-primary;
+  // padding: $space-3 $space-5;
+  // min-width: 18rem;
+
+  &:disabled {
+    background-color: $neutral-mid;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: $neutral-mid;
+    }
+  }
+}

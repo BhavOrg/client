@@ -1,0 +1,114 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.commentSection {
+  @include flex-column;
+  gap: $space-4;
+}
+
+.commentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $space-2;
+}
+
+.commentTitle {
+  font-size: 1.6rem;
+  font-weight: $font-weight-semibold;
+  color: $text-color;
+}
+
+.expertResponseBadge {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  border-radius: $border-radius-sm;
+  background-color: rgba($secondary, 0.1);
+  color: $secondary;
+  font-size: 1.3rem;
+  font-weight: $font-weight-medium;
+}
+
+.newCommentForm {
+  margin-bottom: $space-3;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-5;
+  color: $neutral-dark;
+
+  p {
+    font-size: 1.5rem;
+  }
+}
+
+.spinner {
+  font-size: 2.4rem;
+  animation: spin 1s linear infinite;
+}
+
+.errorContainer {
+  padding: $space-3;
+  border-radius: $border-radius-sm;
+  background-color: rgba($error, 0.1);
+  border-left: 3px solid $error;
+
+  p {
+    color: $error;
+    font-size: 1.5rem;
+  }
+}
+
+.noComments {
+  padding: $space-5;
+  text-align: center;
+  color: $neutral-dark;
+
+  p {
+    font-size: 1.5rem;
+  }
+}
+
+.commentsContainer {
+  @include flex-column;
+  gap: $space-4;
+}
+
+.commentThread {
+  @include flex-column;
+  gap: $space-3;
+}
+
+.replyForm {
+  margin-left: $space-5;
+
+  @include media-breakpoint-down(sm) {
+    margin-left: $space-3;
+  }
+}
+
+.replies {
+  margin-left: $space-5;
+  @include flex-column;
+  gap: $space-3;
+
+  @include media-breakpoint-down(sm) {
+    margin-left: $space-3;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

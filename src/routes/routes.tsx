@@ -1,23 +1,26 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router";
 import MainLayout from "../layouts/MainLayout";
-import HomePage from "../pages/HomePage";
+import FeedLayout from "../layouts/FeedLayout";
+import HomePage from "../pages/Home/Home";
+import FeedPage from "../pages/Feed/FeedPage";
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
 
 // Create a Protected Route component that checks auth status
-const ProtectedRoute = () => {
-  // We'll use localStorage directly here since the useAuth hook
-  // can only be used inside components rendered by React
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem("token");
 
   if (!isAuthenticated) {
-    // Redirect to home if not authenticated
     return <Navigate to="/" replace />;
   }
 
-  // Otherwise, render the children routes
-  return <Outlet />;
+  return <>{children}</>;
 };
 
 export const router = createBrowserRouter([
+  // Main public routes with MainLayout
   {
     path: "/",
     element: <MainLayout />,
@@ -26,7 +29,7 @@ export const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
-      // Public routes
+      // Other public routes
       {
         path: "blogs",
         element: <div>Blogs Page</div>,
@@ -39,21 +42,10 @@ export const router = createBrowserRouter([
         path: "contact",
         element: <div>Contact Page</div>,
       },
-
-      // Protected routes that require authentication
-      {
-        path: "feed",
-        element: <ProtectedRoute />,
-        children: [
-          {
-            index: true,
-            element: <div>Feed Page</div>,
-          },
-        ],
-      },
+      // Profile route with authentication
       {
         path: "profile",
-        element: <ProtectedRoute />,
+        element: <ProtectedRoute children={undefined} />,
         children: [
           {
             index: true,
@@ -61,11 +53,25 @@ export const router = createBrowserRouter([
           },
         ],
       },
-
-      // Catch-all route for 404
+      // Catch-all route
       {
         path: "*",
-        element: <div>Page Not Found</div>, // Replace with your 404 page
+        element: <div>Page Not Found</div>,
+      },
+    ],
+  },
+  // Feed-specific routes with FeedLayout
+  {
+    path: "/feed",
+    element: (
+      <ProtectedRoute>
+        <FeedLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <FeedPage />,
       },
     ],
   },

@@ -1,0 +1,24 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+}
+
+.tag {
+  display: inline-block;
+  padding: $space-1 $space-2;
+  background-color: rgba($accent, 0.1);
+  color: $accent;
+  border-radius: $border-radius-sm;
+  font-size: 1.3rem;
+  font-weight: $font-weight-medium;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba($accent, 0.2);
+    text-decoration: none;
+  }
+}

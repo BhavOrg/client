@@ -1,0 +1,85 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $space-3;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.spinner {
+  border-radius: 50%;
+  border-style: solid;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+.loaderText {
+  font-size: 1.4rem;
+  color: $neutral-dark;
+  text-align: center;
+}
+
+// Sizes
+.small {
+  .spinner {
+    width: 2rem;
+    height: 2rem;
+    border-width: 2px;
+  }
+}
+
+.medium {
+  .spinner {
+    width: 3.2rem;
+    height: 3.2rem;
+    border-width: 3px;
+  }
+}
+
+.large {
+  .spinner {
+    width: 4.8rem;
+    height: 4.8rem;
+    border-width: 4px;
+  }
+}
+
+// Colors
+.primary .spinner {
+  border-color: rgba($primary, 0.2);
+  border-top-color: $primary;
+}
+
+.secondary .spinner {
+  border-color: rgba($secondary, 0.2);
+  border-top-color: $secondary;
+}
+
+.accent .spinner {
+  border-color: rgba($accent, 0.2);
+  border-top-color: $accent;
+}
+
+.neutral .spinner {
+  border-color: rgba($neutral-dark, 0.2);
+  border-top-color: $neutral-dark;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

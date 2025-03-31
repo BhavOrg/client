@@ -1,0 +1,91 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.notification {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+  padding: $space-3;
+  border-radius: $border-radius-md;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+  position: relative;
+
+  &:hover {
+    background-color: $neutral-light;
+  }
+
+  &.unread {
+    background-color: rgba($primary, 0.05);
+
+    &:hover {
+      background-color: rgba($primary, 0.1);
+    }
+  }
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 1.6rem;
+}
+
+.commentIcon {
+  color: $primary;
+}
+
+.likeIcon {
+  color: #f56565; // Red
+}
+
+.expertIcon {
+  color: $secondary;
+}
+
+.mentionIcon {
+  color: #4299e1; // Blue
+}
+
+.tagIcon {
+  color: $accent;
+}
+
+.systemIcon {
+  color: $neutral-dark;
+}
+
+.defaultIcon {
+  color: $neutral-mid;
+}
+
+.content {
+  flex: 1;
+}
+
+.message {
+  color: $text-color;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  margin-bottom: $space-1;
+}
+
+.time {
+  color: $neutral-mid;
+  font-size: 1.3rem;
+}
+
+.unreadIndicator {
+  position: absolute;
+  top: 50%;
+  right: $space-3;
+  transform: translateY(-50%);
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background-color: $primary;
+}
