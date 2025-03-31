@@ -12,3 +12,8 @@ declare module "../services/authService.ts" {
   const AuthService: any;
   export default AuthService;
 }
+
+declare module "*.jpg" {
+  const content: string;
+  export default content;
+}

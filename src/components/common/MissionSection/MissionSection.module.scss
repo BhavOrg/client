@@ -3,7 +3,7 @@
 @use "sass:color";
 
 .mission {
-  padding: $space-8 0;
+  padding: $space-10 0;
   background-color: $surface-color;
   position: relative;
   overflow: hidden;
@@ -108,7 +108,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: $space-8;
+    margin-bottom: $space-10;
     flex-wrap: wrap;
 
     @include media-breakpoint-down(md) {

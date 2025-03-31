@@ -1,0 +1,186 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+@use "sass:color";
+
+.quoteSection {
+  padding: $space-8 0;
+  background-color: $surface-color;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-image: radial-gradient(
+        circle at 10% 20%,
+        rgba($primary, 0.03) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 90% 80%,
+        rgba($secondary, 0.03) 0%,
+        transparent 50%
+      );
+    z-index: 0;
+  }
+
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+
+    @include media-breakpoint-down(md) {
+      flex-direction: column-reverse;
+      text-align: center;
+      gap: $space-6;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    max-width: 60%;
+    padding-right: $space-6;
+
+    @include media-breakpoint-down(md) {
+      max-width: 100%;
+      padding-right: 0;
+    }
+  }
+
+  &__quoteWrapper {
+    position: relative;
+  }
+
+  &__quoteIcon {
+    position: absolute;
+    top: -4rem;
+    left: -2rem;
+    font-size: 12rem;
+    color: rgba($primary, 0.08);
+    font-family: $font-decorative;
+    line-height: 1;
+    user-select: none;
+
+    @include media-breakpoint-down(md) {
+      top: -3rem;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 10rem;
+    }
+
+    @include media-breakpoint-down(sm) {
+      font-size: 8rem;
+      top: -2.5rem;
+    }
+  }
+
+  &__quote {
+    position: relative;
+    font-family: $font-decorative;
+    font-size: 3.2rem;
+    line-height: 1.4;
+    color: $text-color;
+    margin: 0 0 $space-4;
+
+    @include media-breakpoint-down(md) {
+      font-size: 2.8rem;
+    }
+
+    @include media-breakpoint-down(sm) {
+      font-size: 2.4rem;
+    }
+  }
+
+  &__author {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__authorName {
+    font-size: 2.4rem;
+    font-weight: $font-weight-medium;
+    color: $primary;
+    margin-bottom: $space-1;
+
+    @include media-breakpoint-down(md) {
+      font-size: 2.2rem;
+    }
+
+    @include media-breakpoint-down(sm) {
+      font-size: 2rem;
+    }
+  }
+
+  &__authorTitle {
+    font-size: 1.6rem;
+    color: $neutral-dark;
+
+    @include media-breakpoint-down(md) {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__imageWrapper {
+    position: relative;
+    width: 35%;
+    display: flex;
+    justify-content: center;
+
+    @include media-breakpoint-down(md) {
+      width: 70%;
+      max-width: 32rem;
+    }
+
+    @include media-breakpoint-down(sm) {
+      width: 85%;
+    }
+  }
+
+  &__imageContainer {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; // Makes it a square
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  &__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  &__imageRing {
+    position: absolute;
+    top: -$space-3;
+    left: -$space-3;
+    right: -$space-3;
+    bottom: -$space-3;
+    border: 2px solid rgba($secondary, 0.2);
+    border-radius: 50%;
+    z-index: 0;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: $space-2;
+      left: $space-2;
+      right: $space-2;
+      bottom: $space-2;
+      border: 1px solid rgba($primary, 0.15);
+      border-radius: 50%;
+    }
+  }
+}
