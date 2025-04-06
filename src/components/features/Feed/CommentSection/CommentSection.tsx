@@ -1,164 +1,277 @@
+// CommentSection.tsx
 import React, { useState, useEffect } from "react";
-import { FaSpinner } from "react-icons/fa";
+import {
+  FaComments,
+  FaSpinner,
+  FaExclamationTriangle,
+  FaLock,
+} from "react-icons/fa";
 import Comment from "../Comment/Comment";
 import CommentForm from "../CommentForm/CommentForm";
 import {
   fetchComments,
   createComment,
+  likeComment,
 } from "../../../../services/commentsService";
-import { Comment as CommentType } from "../../../../types/feed";
+import useAuth from "../../../../hooks/useAuth";
 import styles from "./CommentSection.module.scss";
 
 interface CommentSectionProps {
   postId: string;
-  hasExpertResponse?: boolean;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({
-  postId,
-  hasExpertResponse,
-}) => {
-  const [comments, setComments] = useState<CommentType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isReplying, setIsReplying] = useState(false);
-  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+// API response interface
+interface ApiResponse {
+  status: string;
+  data?: {
+    comments?: any[];
+    pagination?: any;
+  };
+  message?: string;
+}
 
+const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
+  const { isAuthenticated } = useAuth();
+  const [comments, setComments] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<boolean>(false);
+  const [refreshKey, setRefreshKey] = useState<number>(0);
+
+  // Fetch comments when component mounts or postId changes
   useEffect(() => {
     const loadComments = async () => {
+      if (!isAuthenticated) {
+        setAuthError(true);
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        setLoading(true);
+        setIsLoading(true);
+        setAuthError(false);
         const response = await fetchComments(postId);
-        setComments(response);
-        setLoading(false);
+
+        // Extract comments from the nested response
+        let commentsArray: any[] = [];
+
+        if (response && typeof response === "object") {
+          if (
+            response.status === "success" &&
+            response.data &&
+            response.data.comments
+          ) {
+            commentsArray = response.data.comments;
+          } else if (Array.isArray(response)) {
+            commentsArray = response;
+          }
+        }
+
+        setComments(commentsArray);
+        setError(null);
       } catch (err) {
         setError("Failed to load comments. Please try again.");
-        setLoading(false);
+        console.error("Error fetching comments:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadComments();
-  }, [postId]);
+  }, [postId, isAuthenticated, refreshKey]);
 
-  const handleCreateComment = async (content: string, parentId?: string) => {
+  // Refresh comments
+  const refreshComments = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
+
+  // Handle new comment submission
+  // Inside your CommentSection component
+
+  const handleCommentSubmit = async (content: string, parentId?: string) => {
     try {
-      const newComment = await createComment(postId, content, parentId);
+      const response = await createComment(postId, content, parentId);
 
-      if (!parentId) {
-        // Add new top-level comment
-        setComments([newComment, ...comments]);
-      } else {
-        // Add reply to existing comment
-        setComments(
-          comments.map((comment) => {
-            if (comment.id === parentId) {
+      // Extract the new comment data from the response
+      let newComment;
+      if (response && typeof response === "object") {
+        // Check if the response has a data property (API format 1)
+        if ("data" in response) {
+          newComment = response.data;
+        }
+        // Check if the response has a comment property (API format 2)
+        else if ("comment" in response) {
+          newComment = response.comment;
+        }
+        // Assume the response is the comment itself (API format 3)
+        else {
+          newComment = response;
+        }
+      }
+
+      console.log("New comment created:", newComment);
+
+      if (!newComment) {
+        throw new Error("Invalid comment data received");
+      }
+
+      // If this is a reply to an existing comment
+      if (parentId) {
+        setComments((prevComments) => {
+          return prevComments.map((comment) => {
+            const commentId = comment.comment_id || comment.id;
+            if (commentId === parentId) {
+              // Initialize replies array if it doesn't exist
+              const replies = comment.replies || [];
               return {
                 ...comment,
-                replies: [...(comment.replies || []), newComment],
+                replies: [...replies, newComment],
               };
             }
             return comment;
-          }),
-        );
+          });
+        });
+      } else {
+        // This is a new top-level comment - add it to the comments array
+        setComments((prevComments) => [...prevComments, newComment]);
       }
 
-      // Reset reply state
-      setIsReplying(false);
-      setReplyingToId(null);
+      return true;
     } catch (err) {
-      setError("Failed to post comment. Please try again.");
+      console.error("Error creating comment:", err);
+      return false;
     }
   };
 
-  const handleReplyClick = (commentId: string) => {
-    setIsReplying(true);
-    setReplyingToId(commentId);
+  // Handle like/unlike comment
+  const handleCommentLike = async (commentId: string, isLiked: boolean) => {
+    try {
+      // Update optimistically
+      setComments((prevComments) =>
+        prevComments.map((comment) => {
+          const currCommentId = comment.comment_id || comment.id;
+          if (currCommentId === commentId) {
+            return {
+              ...comment,
+              upvotes: isLiked
+                ? (comment.upvotes || 0) + 1
+                : (comment.upvotes || 0) - 1,
+              user_vote: isLiked ? "up" : null,
+            };
+          }
+          // Check in replies too
+          if (comment.replies && comment.replies.length > 0) {
+            return {
+              ...comment,
+              replies: comment.replies.map((reply: any) => {
+                const replyId = reply.comment_id || reply.id;
+                if (replyId === commentId) {
+                  return {
+                    ...reply,
+                    upvotes: isLiked
+                      ? (reply.upvotes || 0) + 1
+                      : (reply.upvotes || 0) - 1,
+                    user_vote: isLiked ? "up" : null,
+                  };
+                }
+                return reply;
+              }),
+            };
+          }
+          return comment;
+        }),
+      );
+
+      // Call the API
+      await likeComment(commentId, isLiked);
+    } catch (err) {
+      console.error("Error liking comment:", err);
+      // Reload comments on error to ensure data consistency
+      refreshComments();
+    }
   };
-
-  const cancelReply = () => {
-    setIsReplying(false);
-    setReplyingToId(null);
-  };
-
-  // Organize comments into a thread structure (top-level comments and their replies)
-  const topLevelComments = comments.filter((comment) => !comment.parentId);
-
-  // Sort to ensure expert responses appear at the top
-  const sortedComments = [...topLevelComments].sort((a, b) => {
-    // Sort expert responses first
-    if (a.isExpertResponse && !b.isExpertResponse) return -1;
-    if (!a.isExpertResponse && b.isExpertResponse) return 1;
-
-    // Then sort by recent
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
 
   return (
     <div className={styles.commentSection}>
-      <div className={styles.commentHeader}>
-        <h3 className={styles.commentTitle}>Comments ({comments.length})</h3>
-        {hasExpertResponse && (
-          <div className={styles.expertResponseBadge}>
-            Includes Expert Response
-          </div>
-        )}
-      </div>
+      <h3 className={styles.commentTitle}>
+        <FaComments style={{ color: "#6E57B5", marginRight: "8px" }} />
+        Comments ({comments.length})
+      </h3>
 
-      <div className={styles.newCommentForm}>
-        <CommentForm onSubmit={(content) => handleCreateComment(content)} />
-      </div>
-
-      {loading ? (
-        <div className={styles.loadingContainer}>
-          <FaSpinner className={styles.spinner} />
-          <p>Loading comments...</p>
-        </div>
-      ) : error ? (
-        <div className={styles.errorContainer}>
-          <p>{error}</p>
-        </div>
-      ) : sortedComments.length === 0 ? (
-        <div className={styles.noComments}>
-          <p>No comments yet. Be the first to share your thoughts.</p>
+      {/* Authentication error */}
+      {authError ? (
+        <div className={styles.authError}>
+          <FaLock style={{ marginRight: "8px" }} />
+          <p>Please log in to view and post comments.</p>
         </div>
       ) : (
-        <div className={styles.commentsContainer}>
-          {sortedComments.map((comment) => (
-            <div key={comment.id} className={styles.commentThread}>
-              <Comment
-                comment={comment}
-                onReplyClick={() => handleReplyClick(comment.id)}
+        <>
+          {/* New comment form - only show if authenticated */}
+          {isAuthenticated && (
+            <div className={styles.newCommentForm}>
+              <CommentForm
+                onSubmit={(content: string) => handleCommentSubmit(content)}
+                placeholder="Share your thoughts..."
               />
+            </div>
+          )}
 
-              {/* Show reply form if this comment is being replied to */}
-              {isReplying && replyingToId === comment.id && (
-                <div className={styles.replyForm}>
-                  <CommentForm
-                    onSubmit={(content) =>
-                      handleCreateComment(content, comment.id)
+          {/* Loading state */}
+          {isLoading && (
+            <div className={styles.loading}>
+              <FaSpinner className={styles.spinner} />
+              Loading comments...
+            </div>
+          )}
+
+          {/* Error state */}
+          {error && (
+            <div className={styles.error}>
+              <FaExclamationTriangle style={{ marginRight: "8px" }} />
+              {error}
+              <button onClick={refreshComments} className={styles.retryButton}>
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {/* Comments list */}
+          {!isLoading && !error && (
+            <div className={styles.commentsList}>
+              {comments.length === 0 ? (
+                <div className={styles.noComments}>
+                  No comments yet.{" "}
+                  {isAuthenticated
+                    ? "Be the first to share your thoughts!"
+                    : ""}
+                </div>
+              ) : (
+                comments.map((comment) => (
+                  <Comment
+                    key={
+                      comment.comment_id ||
+                      comment.id ||
+                      Math.random().toString()
                     }
-                    onCancel={cancelReply}
-                    isReply
+                    comment={comment}
+                    onReply={(content: string) =>
+                      handleCommentSubmit(
+                        content,
+                        comment.comment_id || comment.id,
+                      )
+                    }
+                    onLike={(isLiked: boolean) =>
+                      handleCommentLike(
+                        comment.comment_id || comment.id,
+                        isLiked,
+                      )
+                    }
                   />
-                </div>
-              )}
-
-              {/* Show replies */}
-              {comment.replies && comment.replies.length > 0 && (
-                <div className={styles.replies}>
-                  {comment.replies.map((reply) => (
-                    <Comment
-                      key={reply.id}
-                      comment={reply}
-                      onReplyClick={() => handleReplyClick(reply.id)}
-                      isReply
-                    />
-                  ))}
-                </div>
+                ))
               )}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -3,6 +3,7 @@ import MainLayout from "../layouts/MainLayout";
 import FeedLayout from "../layouts/FeedLayout";
 import HomePage from "../pages/Home/Home";
 import FeedPage from "../pages/Feed/FeedPage";
+import CommunityPage from "../pages/Community/CommunityPage";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -36,7 +37,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "community",
-        element: <div>Community Page</div>,
+        element: <CommunityPage />,
       },
       {
         path: "contact",

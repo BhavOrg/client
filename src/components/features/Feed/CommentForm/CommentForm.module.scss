@@ -1,42 +1,119 @@
+/* CommentForm.module.scss */
 @use "../../../../styles/variables" as *;
 @use "../../../../styles/mixins" as *;
-@use "sass:color";
 
 .commentForm {
   @include flex-column;
   gap: $space-3;
   width: 100%;
+  position: relative;
+
+  &.focused {
+    .inputContainer {
+      border-color: $primary;
+      box-shadow: 0 0 0 2px rgba($primary, 0.1);
+    }
+
+    .toolbox {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+.inputContainer {
+  position: relative;
+  width: 100%;
+  border: 1px solid rgba($neutral-mid, 0.3);
+  border-radius: 4px;
+  background-color: $surface-color;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+
+  &:hover {
+    border-color: rgba($primary, 0.5);
+  }
 }
 
 .commentInput {
   width: 100%;
-  padding: $space-3;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-md;
+  padding: $space-3 $space-4 $space-4 $space-4;
+  border: none;
   font-family: $font-primary;
   font-size: 1.5rem;
   line-height: 1.5;
-  resize: vertical;
-  background-color: $surface-color;
+  resize: none;
+  background-color: transparent;
   color: $text-color;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  min-height: 24px;
+  max-height: 200px;
+  overflow-y: auto;
 
   &:focus {
     outline: none;
-    border-color: $primary;
-    box-shadow: 0 0 0 2px rgba($primary, 0.1);
   }
 
   &::placeholder {
     color: $neutral-mid;
+    font-style: italic;
+  }
+
+  &:disabled {
+    background-color: rgba($neutral-light, 0.5);
+    cursor: not-allowed;
+  }
+}
+
+.toolbox {
+  display: flex;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  transition: all 0.3s ease;
+  background: linear-gradient(to left, $surface-color 70%, transparent);
+  border-radius: 16px;
+  opacity: 0.7;
+  transform: translateY(5px);
+
+  .commentForm:hover & {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toolButton {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  background-color: transparent;
+  color: $neutral-dark;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.4rem;
+
+  &:hover {
+    background-color: rgba($neutral-light, 0.8);
+    color: $primary;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
 .formActions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: $space-3;
 }
 
@@ -46,34 +123,71 @@
   align-items: center;
   gap: $space-2;
   padding: $space-2 $space-3;
-  border-radius: $border-radius-md;
   font-size: 1.4rem;
   font-weight: $font-weight-medium;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  border-radius: 16px;
 }
 
 .submitButton {
-  background-color: $primary;
+  background: linear-gradient(to right, $primary, rgb(255, 92, 67));
   color: white;
   border: none;
+  box-shadow: 0 2px 4px rgba($primary, 0.25);
 
   &:hover:not(:disabled) {
-    background-color: color.adjust($primary, $lightness: -5%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba($primary, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 
   &:disabled {
-    background-color: $neutral-mid;
+    background: linear-gradient(
+      to right,
+      $neutral-mid,
+      rgba($neutral-mid, 0.8)
+    );
     cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  span {
+    @include media-breakpoint-down(sm) {
+      display: none;
+    }
   }
 }
 
 .cancelButton {
-  background-color: transparent;
+  background-color: $neutral-light;
   color: $neutral-dark;
-  border: 1px solid $border-color;
+  border: none;
 
   &:hover {
-    background-color: $neutral-light;
+    background-color: darken($neutral-light, 5%);
+    color: $text-color;
+  }
+
+  span {
+    @include media-breakpoint-down(sm) {
+      display: none;
+    }
+  }
+}
+
+.formTip {
+  position: absolute;
+  bottom: -20px;
+  right: 0;
+  font-size: 1.2rem;
+  color: $neutral-mid;
+  font-style: italic;
+
+  @include media-breakpoint-down(sm) {
+    display: none;
   }
 }

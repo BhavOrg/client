@@ -8,7 +8,6 @@ export interface User {
 
 // Tag type
 export interface Tag {
-  data: any;
   id: string;
   name: string;
   count?: number;
@@ -62,6 +61,7 @@ export interface Post {
 
 // Comment types
 export interface Comment {
+  data: any;
   id: string;
   author: User;
   content: string;

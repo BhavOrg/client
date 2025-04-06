@@ -101,8 +101,18 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   const handleTagSelect = (tag: Tag) => {
     if (selectedTags.length >= maxTags) return;
 
+    console.log("Selecting tag:", tag);
+
+    // Verify the tag has the required properties
+    if (!tag.id || !tag.name) {
+      console.error("Invalid tag format:", tag);
+      return;
+    }
+
     if (!selectedTags.some((t) => t.id === tag.id)) {
       const newSelectedTags = [...selectedTags, tag];
+      console.log("Updated selected tags:", newSelectedTags);
+      // Call the parent's onChange function to update the parent state
       onChange(newSelectedTags);
     }
   };
@@ -114,26 +124,64 @@ const TagSelector: React.FC<TagSelectorProps> = ({
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+    // Initialize the newTagName with the search term for easier creation
+    setNewTagName(e.target.value);
   };
 
+  // Handle creating a new tag
   const handleCreateTag = async () => {
     if (!newTagName.trim()) return;
 
     try {
-      const createdTag = await createTag(newTagName.trim());
+      setIsLoading(true);
+      console.log("Creating tag:", newTagName);
 
-      // Ensure createdTag is a valid Tag object
-      if (createdTag && createdTag.id && createdTag.name) {
-        // Update available tags and select the new tag
-        setAvailableTags((prev) => [...prev, createdTag]);
-        handleTagSelect(createdTag);
+      // Call the API to create the tag
+      const response = await createTag(newTagName);
+      console.log("Tag creation API response:", response);
 
-        // Reset creation state
-        setNewTagName("");
-        setIsCreatingTag(false);
-      }
+      // Ensure we have a proper tag structure
+      const newTag: Tag = {
+        id: response.id || `temp-${Date.now()}`, // Fallback ID if missing
+        name: newTagName,
+        data: undefined,
+      };
+      console.log("Formatted new tag:", newTag);
+
+      // Update the available tags list
+      setAvailableTags((prevTags) => {
+        const updatedTags = Array.isArray(prevTags) ? [...prevTags] : [];
+
+        // Check if the tag is already in the list
+        if (!updatedTags.some((tag) => tag.id === newTag.id)) {
+          updatedTags.push(newTag);
+        }
+
+        return updatedTags;
+      });
+
+      // Add the new tag to selected tags
+      // First make sure the tag has the proper structure
+      const tagToAdd: Tag = {
+        id: newTag.id,
+        name: newTag.name,
+        data: undefined,
+      };
+      console.log("Adding tag to selected tags:", tagToAdd);
+      handleTagSelect(tagToAdd);
+
+      // Clear inputs and states
+      setNewTagName("");
+      setSearchTerm("");
+      setIsCreatingTag(false);
+      setIsLoading(false);
+
+      // Refresh tags list
+      const refreshedTags = await fetchTags();
+      setAvailableTags(refreshedTags);
     } catch (error) {
-      console.error("Failed to create tag:", error);
+      console.error("Error creating tag:", error);
+      setIsLoading(false);
     }
   };
 
@@ -159,7 +207,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
         <div className={styles.selectedTags}>
           {selectedTags.map((tag) => (
             <div key={tag.id} className={styles.tagPill}>
-              <span>{tag.name}</span>
+              <span>{tag.name || "Unnamed Tag"}</span>
               <button
                 type="button"
                 onClick={() => handleTagRemove(tag.id)}
@@ -211,7 +259,10 @@ const TagSelector: React.FC<TagSelectorProps> = ({
             {showCreateOption && (
               <button
                 className={styles.createTagOption}
-                onClick={() => setIsCreatingTag(true)}
+                onClick={() => {
+                  setIsCreatingTag(true);
+                  setNewTagName(searchTerm);
+                }}
                 disabled={selectedTags.length >= maxTags}
               >
                 <FaPlus />
@@ -229,11 +280,15 @@ const TagSelector: React.FC<TagSelectorProps> = ({
               onChange={(e) => setNewTagName(e.target.value)}
               placeholder="Enter tag name"
               className={styles.createTagInput}
+              autoFocus
             />
             <div className={styles.createTagActions}>
               <button
                 type="button"
-                onClick={() => setIsCreatingTag(false)}
+                onClick={() => {
+                  setIsCreatingTag(false);
+                  setNewTagName("");
+                }}
                 className={styles.cancelButton}
               >
                 Cancel
@@ -242,9 +297,9 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                 type="button"
                 onClick={handleCreateTag}
                 className={styles.createButton}
-                disabled={!newTagName.trim()}
+                disabled={!newTagName.trim() || isLoading}
               >
-                Create Tag
+                {isLoading ? "Creating..." : "Create Tag"}
               </button>
             </div>
           </div>
