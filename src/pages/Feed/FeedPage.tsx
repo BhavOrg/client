@@ -3,22 +3,25 @@ import { useNavigate } from "react-router";
 import Container from "../../components/common/Container/Container";
 import PostCreationForm from "../../components/features/Feed/PostCreationForm/PostCreationForm";
 import Post from "../../components/features/Feed/Post/Post";
-import FeedFilters from "../../components/features/Feed/FeedFilters/FeedFilters";
 import Loader from "../../components/common/Loader/Loader";
 import Modal from "../../components/common/Modal/Modal";
 import Button from "../../components/common/Button/Button";
 import useAuth from "../../hooks/useAuth";
-import { fetchPosts, createPost, likePost } from "../../services/PostsService";
 import {
-  Tag,
+  fetchPosts,
+  createPost,
+  likePost,
+  savePost,
+} from "../../services/PostsService";
+import {
   Post as PostType,
-  SortOption,
-  FilterOption,
+  PostCreationData,
+  PaginatedResponse,
 } from "../../types/feed";
 import styles from "./FeedPage.module.scss";
 
 const FeedPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated, triggerLogin } = useAuth();
   const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +29,7 @@ const FeedPage: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [createPostError, setCreatePostError] = useState<string | null>(null);
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastPostElementRef = useRef<HTMLDivElement | null>(null);
@@ -37,7 +41,7 @@ const FeedPage: React.FC = () => {
 
     const fetchFeedData = async () => {
       try {
-        // Use filter values from parent layout via props or context if needed
+        // Use the page parameter for pagination
         const response = await fetchPosts({ page });
 
         if (page === 1) {
@@ -46,7 +50,7 @@ const FeedPage: React.FC = () => {
           setPosts((prevPosts) => [...prevPosts, ...response.data]);
         }
 
-        setHasMore(response.data.length > 0);
+        setHasMore(response.hasNextPage);
         setLoading(false);
       } catch (err) {
         setError("Failed to load posts. Please try again later.");
@@ -85,13 +89,36 @@ const FeedPage: React.FC = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
 
-  const handleCreatePost = async (postData: any) => {
+  const handleCreatePost = async (postData: PostCreationData) => {
+    // Clear any previous errors
+    setCreatePostError(null);
+
+    // Check authentication before attempting to create post
+    if (!isAuthenticated) {
+      // Trigger login modal
+      triggerLogin();
+      setCreatePostError("Please log in to create a post.");
+      return;
+    }
+
     try {
       await createPost(postData);
       setIsCreatePostModalOpen(false);
       handleRefresh();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to create post", err);
+
+      // Handle specific authentication errors
+      if (err.response?.status === 401) {
+        setCreatePostError("Authentication failed. Please log in again.");
+        triggerLogin();
+      } else {
+        // Handle other potential errors
+        setCreatePostError(
+          err.response?.data?.message ||
+            "Failed to create post. Please try again.",
+        );
+      }
     }
   };
 
@@ -102,10 +129,15 @@ const FeedPage: React.FC = () => {
       // Update posts state to reflect the like action
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
-          post.id === postId
+          post.post_id === postId || post.id === postId
             ? {
                 ...post,
-                likeCount: isLiked ? post.likeCount + 1 : post.likeCount - 1,
+                upvotes: isLiked
+                  ? (post.upvotes || 0) + 1
+                  : (post.upvotes || 0) - 1,
+                likeCount: isLiked
+                  ? (post.likeCount || 0) + 1
+                  : (post.likeCount || 0) - 1,
                 isLikedByUser: isLiked,
               }
             : post,
@@ -116,59 +148,108 @@ const FeedPage: React.FC = () => {
     }
   };
 
-  return (
-    <Container>
-      <div className={styles.postsContainer}>
-        {error && (
-          <div className={styles.errorMessage}>
-            <p>{error}</p>
-            <Button onClick={handleRefresh}>Try Again</Button>
-          </div>
-        )}
+  const handlePostSave = async (postId: string, isSaved: boolean) => {
+    try {
+      await savePost(postId, isSaved);
 
-        {posts.length === 0 && !loading && !error ? (
-          <div className={styles.emptyState}>
-            <h3>No posts found</h3>
-            <p>Be the first to share your thoughts with the community.</p>
-            <Button onClick={() => setIsCreatePostModalOpen(true)}>
-              Create a Post
-            </Button>
-          </div>
-        ) : (
-          <>
-            {posts.map((post, index) => {
-              if (posts.length === index + 1) {
-                return (
-                  <div ref={lastPostElementRef} key={post.id}>
-                    <Post post={post} onLike={handlePostLike} />
-                  </div>
-                );
-              } else {
-                return (
-                  <Post key={post.id} post={post} onLike={handlePostLike} />
-                );
+      // Update posts state to reflect the save action
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.post_id === postId || post.id === postId
+            ? {
+                ...post,
+                isSavedByUser: isSaved,
               }
-            })}
-          </>
-        )}
+            : post,
+        ),
+      );
+    } catch (err) {
+      console.error("Failed to save post", err);
+    }
+  };
 
-        {loading && (
-          <div className={styles.loaderContainer}>
-            <Loader />
-          </div>
-        )}
+  // Close error message after some time
+  useEffect(() => {
+    if (createPostError) {
+      const timer = setTimeout(() => {
+        setCreatePostError(null);
+      }, 5000);
 
-        {/* Create Post Modal */}
-        <Modal
-          isOpen={isCreatePostModalOpen}
+      return () => clearTimeout(timer);
+    }
+  }, [createPostError]);
+
+  return (
+    <div className={styles.postsContainer}>
+      {error && (
+        <div className={styles.errorMessage}>
+          <p>{error}</p>
+          <Button onClick={handleRefresh}>Try Again</Button>
+        </div>
+      )}
+
+      {posts.length === 0 && !loading && !error ? (
+        <div className={styles.emptyState}>
+          <h3>No posts found</h3>
+          <p>Be the first to share your thoughts with the community.</p>
+          <Button onClick={() => setIsCreatePostModalOpen(true)}>
+            Create a Post
+          </Button>
+        </div>
+      ) : (
+        <>
+          {posts.map((post, index) => {
+            if (posts.length === index + 1) {
+              return (
+                <div ref={lastPostElementRef} key={post.post_id || post.id}>
+                  <Post
+                    post={post}
+                    onLike={handlePostLike}
+                    onSave={handlePostSave}
+                  />
+                </div>
+              );
+            } else {
+              return (
+                <Post
+                  key={post.post_id || post.id}
+                  post={post}
+                  onLike={handlePostLike}
+                  onSave={handlePostSave}
+                />
+              );
+            }
+          })}
+        </>
+      )}
+
+      {loading && (
+        <div className={styles.loaderContainer}>
+          <Loader />
+        </div>
+      )}
+
+      {/* Authentication Error Modal */}
+      {createPostError && (
+        <div className={styles.createPostErrorBanner}>
+          <p>{createPostError}</p>
+          <Button onClick={() => triggerLogin()}>Log In</Button>
+        </div>
+      )}
+
+      {/* Create Post Modal */}
+      <Modal
+        isOpen={isCreatePostModalOpen}
+        onClose={() => setIsCreatePostModalOpen(false)}
+        title="Share Your Thoughts"
+        className={styles.createPostModal}
+      >
+        <PostCreationForm
+          onSubmit={handleCreatePost}
           onClose={() => setIsCreatePostModalOpen(false)}
-          title="Share Your Thoughts"
-          className={styles.createPostModal}
-        >
-          <PostCreationForm onSubmit={handleCreatePost} />
-        </Modal>
-      </div>
-    </Container>
+        />
+      </Modal>
+    </div>
   );
 };
 

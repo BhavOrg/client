@@ -1,181 +1,210 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
+import { formatDistanceToNow } from "date-fns";
 import {
   FaHeart,
   FaRegHeart,
   FaComment,
-  FaEye,
-  FaEyeSlash,
-  FaShare,
   FaExclamationTriangle,
+  FaBookmark,
+  FaRegBookmark,
+  FaEllipsisH,
 } from "react-icons/fa";
-import { formatDistanceToNow } from "date-fns";
-import Button from "../../../common/Button/Button";
+import { Post as PostType, UrgencyLevel, Tag } from "../../../../types/feed";
 import Avatar from "../../../common/Avatar/Avatar";
 import TagList from "../../../common/TagList/TagList";
 import CommentSection from "../CommentSection/CommentSection";
-import { Post as PostType } from "../../../../types/feed";
 import styles from "./Post.module.scss";
 
 interface PostProps {
   post: PostType;
   onLike: (postId: string, isLiked: boolean) => void;
+  onSave?: (postId: string, isSaved: boolean) => void;
+  showComments?: boolean;
 }
 
-const Post: React.FC<PostProps> = ({ post, onLike }) => {
-  const [isContentVisible, setIsContentVisible] = useState(
-    !post.hasTriggerWarning,
-  );
-  const [showComments, setShowComments] = useState(false);
+const Post: React.FC<PostProps> = ({
+  post,
+  onLike,
+  onSave,
+  showComments = false,
+}) => {
+  const [isCommentsOpen, setIsCommentsOpen] = useState(showComments);
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
-  const {
-    id,
-    author,
-    content,
-    createdAt,
-    tags,
-    likeCount,
-    commentCount,
-    isLikedByUser,
-    hasTriggerWarning,
-    triggerWarningText,
-    urgencyLevel,
-    hasExpertResponse,
-    isAnonymous,
-  } = post;
+  // Handle compatibility with both API and client-side formats
+  const postId = post.post_id || post.id || "";
+  const isAnonymous = post.is_anonymous || post.isAnonymous || false;
+  const hasExpertResponse =
+    post.expert_responded || post.hasExpertResponse || false;
+  const urgencyLevel = post.urgency_level || "low";
+  const createdAt = post.created_at || "";
+  const content = post.content || "";
+
+  // Handle likes count from different fields
+  const likeCount = post.upvotes || post.likeCount || 0;
+  const commentCount = post.comment_count || 0;
+  const isLiked = post.isLikedByUser || false;
+  const isSaved = post.isSavedByUser || false;
+
+  // Handle tags from different formats
+  let formattedTags: Tag[] = [];
+  if (Array.isArray(post.tags)) {
+    if (post.tags.length > 0) {
+      if (typeof post.tags[0] === "string") {
+        // If tags are strings, convert them to Tag objects
+        formattedTags = (post.tags as string[]).map((tag) => ({
+          id: tag,
+          name: tag,
+        }));
+      } else {
+        // If tags are already Tag objects
+        formattedTags = post.tags as Tag[];
+      }
+    }
+  }
 
   const handleLikeClick = () => {
-    onLike(id, !isLikedByUser);
+    onLike(postId, !isLiked);
   };
 
-  const handleToggleComments = () => {
-    setShowComments(!showComments);
+  const handleSaveClick = () => {
+    if (onSave) {
+      onSave(postId, !isSaved);
+    }
   };
 
-  const handleToggleContent = () => {
-    setIsContentVisible(!isContentVisible);
+  const handleCommentsToggle = () => {
+    setIsCommentsOpen(!isCommentsOpen);
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/post/${id}`);
-    // You could add a toast notification here
+  const handleOptionsToggle = () => {
+    setIsOptionsOpen(!isOptionsOpen);
   };
 
-  const renderUrgencyIndicator = () => {
-    if (!urgencyLevel || urgencyLevel === "low") return null;
-
-    const labels = {
-      medium: "Support Needed",
-      high: "Urgent Support",
-      critical: "Critical",
-    };
-
-    const className = {
-      medium: styles.medium,
-      high: styles.high,
-      critical: styles.critical,
-    };
-
-    return (
-      <div
-        className={`${styles.urgencyIndicator} ${className[urgencyLevel as keyof typeof className]}`}
-      >
-        <FaExclamationTriangle />
-        <span>{labels[urgencyLevel as keyof typeof labels]}</span>
-      </div>
-    );
+  // Helper function to get urgency indicator classes
+  const getUrgencyClass = (level: UrgencyLevel): string => {
+    switch (level) {
+      case "critical":
+        return styles.urgencyCritical;
+      case "high":
+        return styles.urgencyHigh;
+      case "medium":
+        return styles.urgencyMedium;
+      default:
+        return styles.urgencyLow;
+    }
   };
+
+  // Format the relative time (e.g., "3 hours ago")
+  const formattedDate = createdAt
+    ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
+    : "";
 
   return (
-    <div
-      className={`${styles.post} ${urgencyLevel && urgencyLevel !== "low" ? styles[urgencyLevel] : ""}`}
-    >
+    <div className={styles.post}>
+      {/* Urgency indicator */}
+      <div
+        className={`${styles.urgencyIndicator} ${getUrgencyClass(urgencyLevel as UrgencyLevel)}`}
+      />
+
       <div className={styles.postHeader}>
         <div className={styles.postAuthor}>
-          <Avatar
-            username={isAnonymous ? "Anonymous" : author.username}
-            imageSrc={isAnonymous ? undefined : author.avatarUrl}
-            size="medium"
-          />
+          {post.author ? (
+            <Avatar
+              username={isAnonymous ? "Anonymous" : post.author.username}
+              imageSrc={post.author.avatarUrl}
+              size="medium"
+            />
+          ) : (
+            <Avatar username="Anonymous" size="medium" />
+          )}
           <div className={styles.authorInfo}>
             <span className={styles.authorName}>
-              {isAnonymous ? "Anonymous" : author.username}
+              {isAnonymous ? "Anonymous" : post.author?.username || "User"}
             </span>
-            <span className={styles.postTime}>
-              {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
-            </span>
+            <span className={styles.postDate}>{formattedDate}</span>
           </div>
         </div>
 
-        <div className={styles.postMeta}>
+        <div className={styles.postActions}>
           {hasExpertResponse && (
-            <div className={styles.expertBadge}>Expert Response</div>
+            <div className={styles.expertResponseBadge}>Expert Response</div>
           )}
-          {renderUrgencyIndicator()}
-        </div>
-      </div>
-
-      {hasTriggerWarning && (
-        <div className={styles.triggerWarning}>
-          <div className={styles.warningHeader}>
-            <FaExclamationTriangle />
-            <span>Trigger Warning</span>
-          </div>
-          {triggerWarningText && <p>{triggerWarningText}</p>}
-          <Button
-            onClick={handleToggleContent}
-            className={styles.warningButton}
+          <button
+            className={styles.optionsButton}
+            onClick={handleOptionsToggle}
+            aria-label="Post options"
           >
-            {isContentVisible ? (
-              <>
-                <FaEyeSlash /> Hide Content
-              </>
-            ) : (
-              <>
-                <FaEye /> View Content
-              </>
-            )}
-          </Button>
-        </div>
-      )}
+            <FaEllipsisH />
+          </button>
 
-      {isContentVisible && (
-        <>
-          <div className={styles.postContent}>
-            <p>{content}</p>
-          </div>
-
-          {tags && tags.length > 0 && (
-            <div className={styles.tagsContainer}>
-              <TagList tags={tags} />
+          {isOptionsOpen && (
+            <div className={styles.optionsMenu}>
+              <button className={styles.optionMenuItem}>Report Post</button>
+              <button className={styles.optionMenuItem}>Copy Link</button>
+              {/* Additional options */}
             </div>
           )}
-        </>
-      )}
-
-      <div className={styles.postActions}>
-        <Button
-          onClick={handleLikeClick}
-          className={`${styles.actionButton} ${isLikedByUser ? styles.liked : ""}`}
-        >
-          {isLikedByUser ? <FaHeart /> : <FaRegHeart />}
-          <span>{likeCount}</span>
-        </Button>
-
-        <Button onClick={handleToggleComments} className={styles.actionButton}>
-          <FaComment />
-          <span>{commentCount}</span>
-        </Button>
-
-        <Button onClick={handleShare} className={styles.actionButton}>
-          <FaShare />
-          <span>Share</span>
-        </Button>
+        </div>
       </div>
 
-      {showComments && (
-        <div className={styles.commentsSection}>
-          <CommentSection postId={id} hasExpertResponse={hasExpertResponse} />
+      {post.hasTriggerWarning && (
+        <div className={styles.triggerWarning}>
+          <FaExclamationTriangle />
+          <span>
+            Trigger Warning:{" "}
+            {post.triggerWarningText ||
+              "This post may contain sensitive content"}
+          </span>
+        </div>
+      )}
+
+      <div className={styles.postContent}>
+        <p>{content}</p>
+      </div>
+
+      {formattedTags.length > 0 && (
+        <div className={styles.postTags}>
+          <TagList tags={formattedTags} />
+        </div>
+      )}
+
+      <div className={styles.postFooter}>
+        <div className={styles.postStats}>
+          <button
+            className={`${styles.likeButton} ${isLiked ? styles.liked : ""}`}
+            onClick={handleLikeClick}
+            aria-label={isLiked ? "Unlike post" : "Like post"}
+          >
+            {isLiked ? <FaHeart /> : <FaRegHeart />}
+            <span>{likeCount}</span>
+          </button>
+
+          <button
+            className={styles.commentButton}
+            onClick={handleCommentsToggle}
+            aria-label="View comments"
+          >
+            <FaComment />
+            <span>{commentCount}</span>
+          </button>
+
+          {onSave && (
+            <button
+              className={`${styles.saveButton} ${isSaved ? styles.saved : ""}`}
+              onClick={handleSaveClick}
+              aria-label={isSaved ? "Unsave post" : "Save post"}
+            >
+              {isSaved ? <FaBookmark /> : <FaRegBookmark />}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {isCommentsOpen && (
+        <div className={styles.commentsContainer}>
+          <CommentSection postId={postId} />
         </div>
       )}
     </div>

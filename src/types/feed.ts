@@ -1,4 +1,4 @@
-// User types
+// Updated Post interface to match the API response
 export interface User {
   id: string;
   username: string;
@@ -8,31 +8,56 @@ export interface User {
 
 // Tag type
 export interface Tag {
+  data: any;
   id: string;
   name: string;
   count?: number;
   category?: string;
 }
 
+export interface ApiTag {
+  tag_id: number;
+  name: string;
+  post_count: string;
+}
+
+export interface TagsResponse {
+  status: string;
+  data: {
+    tags: ApiTag[];
+  };
+}
+
 // Post types
 export type UrgencyLevel = "low" | "medium" | "high" | "critical";
 
 export interface Post {
-  id: string;
-  author: User;
+  post_id: string;
+  author_id?: string;
   content: string;
-  tags: Tag[];
-  createdAt: string;
-  updatedAt?: string;
-  likeCount: number;
-  commentCount: number;
-  isLikedByUser: boolean;
+  upvotes: number;
+  downvotes: number;
+  comment_count: number;
+  is_anonymous: boolean;
+  sentiment_score?: string;
+  urgency_level: UrgencyLevel;
+  expert_responded: boolean;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  author_username: string | null;
+  tags: string[] | Tag[];
+
+  // Client-side properties (not from API)
+  id?: string; // For backward compatibility
+  author?: User; // Populated client-side
+  likeCount?: number; // For backward compatibility
+  isLikedByUser?: boolean;
   isSavedByUser?: boolean;
-  hasTriggerWarning: boolean;
+  hasTriggerWarning?: boolean;
   triggerWarningText?: string;
-  urgencyLevel?: UrgencyLevel;
-  hasExpertResponse: boolean;
-  isAnonymous: boolean;
+  hasExpertResponse?: boolean; // Alias for expert_responded
+  isAnonymous?: boolean; // Alias for is_anonymous
 }
 
 // Comment types
@@ -49,6 +74,22 @@ export interface Comment {
   isExpertResponse: boolean;
   isAnonymous: boolean;
   replies?: Comment[];
+}
+
+// API response interfaces
+export interface PostsResponse {
+  status: string;
+  data: {
+    posts: Post[];
+    pagination: PaginationInfo;
+  };
+}
+
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
 
 // Filter and sort options
@@ -75,15 +116,6 @@ export interface CommentCreationData {
   parentId?: string;
 }
 
-// API response types
-export interface PaginatedResponse<T> {
-  data: T[];
-  page: number;
-  totalPages: number;
-  totalItems: number;
-  hasNextPage: boolean;
-}
-
 // Query params for fetching posts
 export interface PostsQueryParams {
   page?: number;
@@ -92,6 +124,15 @@ export interface PostsQueryParams {
   filter?: FilterOption | null;
   tags?: string[];
   search?: string;
+}
+
+// Paginated response for client
+export interface PaginatedResponse<T> {
+  data: T[];
+  page: number;
+  totalPages: number;
+  totalItems: number;
+  hasNextPage: boolean;
 }
 
 // Notification types

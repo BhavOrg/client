@@ -1,24 +1,213 @@
 @use "../../../styles/variables" as *;
 @use "../../../styles/mixins" as *;
+@use "sass:color";
 
+// Tag List Container
 .tagList {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: $space-2;
+
+  @include media-breakpoint-down(sm) {
+    gap: $space-1;
+  }
 }
 
+// Base Tag Styles
 .tag {
-  display: inline-block;
+  // Layout and Typography
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-1;
   padding: $space-1 $space-2;
+  border-radius: $border-radius-sm;
+
+  // Typography
+  font-size: 1.2rem;
+  font-weight: $font-weight-medium;
+  line-height: 1.4;
+
+  // Transition and Interaction
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease;
+  cursor: default;
+
+  // Default Color Scheme
+  background-color: $neutral-light;
+  color: $neutral-dark;
+
+  // Hover State
+  &:hover {
+    background-color: color.adjust($neutral-light, $lightness: -5%);
+    transform: translateY(-1px);
+  }
+
+  // Focus State
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+}
+
+// Linkable Tag Variant
+.linkable {
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+    background-color: color.adjust($neutral-light, $lightness: -10%);
+  }
+}
+
+// Removable Tag Variant
+.removable {
+  padding-right: $space-1;
+
+  // Remove Button Styling
+  .removeButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-left: $space-1;
+    border-radius: 50%;
+    background-color: transparent;
+    color: $neutral-dark;
+    border: none;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover {
+      background-color: rgba($neutral-dark, 0.1);
+      color: $error;
+    }
+  }
+}
+
+// Tag Count Styles
+.tagCount {
+  font-size: 1rem;
+  opacity: 0.7;
+  margin-left: $space-1;
+}
+
+// Color Variants
+.default {
   background-color: rgba($accent, 0.1);
   color: $accent;
-  border-radius: $border-radius-sm;
-  font-size: 1.3rem;
-  font-weight: $font-weight-medium;
-  transition: all 0.2s ease;
 
   &:hover {
     background-color: rgba($accent, 0.2);
-    text-decoration: none;
+  }
+}
+
+.primary {
+  background-color: rgba($primary, 0.1);
+  color: $primary;
+
+  &:hover {
+    background-color: rgba($primary, 0.2);
+  }
+}
+
+.secondary {
+  background-color: rgba($secondary, 0.1);
+  color: $secondary;
+
+  &:hover {
+    background-color: rgba($secondary, 0.2);
+  }
+}
+
+.success {
+  background-color: rgba($success, 0.1);
+  color: $success;
+
+  &:hover {
+    background-color: rgba($success, 0.2);
+  }
+}
+
+.warning {
+  background-color: rgba($warning, 0.1);
+  color: $warning;
+
+  &:hover {
+    background-color: rgba($warning, 0.2);
+  }
+}
+
+.error {
+  background-color: rgba($error, 0.1);
+  color: $error;
+
+  &:hover {
+    background-color: rgba($error, 0.2);
+  }
+}
+
+// Active/Selected State
+.active {
+  font-weight: $font-weight-semibold;
+
+  &.default {
+    background-color: $accent;
+    color: white;
+  }
+
+  &.primary {
+    background-color: $primary;
+    color: white;
+  }
+
+  &.secondary {
+    background-color: $secondary;
+    color: white;
+  }
+
+  &.success {
+    background-color: $success;
+    color: white;
+  }
+
+  &.warning {
+    background-color: $warning;
+    color: white;
+  }
+
+  &.error {
+    background-color: $error;
+    color: white;
+  }
+}
+
+// Size Variants
+.small {
+  font-size: 1rem;
+  padding: $space-1 $space-2;
+}
+
+.large {
+  font-size: 1.4rem;
+  padding: $space-2 $space-3;
+}
+
+// Responsive Adjustments
+@include media-breakpoint-down(sm) {
+  .tag {
+    font-size: 1.1rem;
+    padding: $space-1 $space-2;
+  }
+
+  .tagCount {
+    font-size: 0.9rem;
   }
 }

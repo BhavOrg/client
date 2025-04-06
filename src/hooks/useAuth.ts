@@ -26,6 +26,9 @@ interface AuthContextType {
   logout: () => Promise<void>;
   error: string | null;
   clearError: () => void;
+  triggerLogin: () => void;
+  openAuthDialog: boolean;
+  setOpenAuthDialog: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Create context with default values
@@ -39,6 +42,9 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
   error: null,
   clearError: () => {},
+  triggerLogin: () => {},
+  openAuthDialog: false,
+  setOpenAuthDialog: () => {},
 });
 
 interface AuthProviderProps {
@@ -52,6 +58,7 @@ export const AuthProvider = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [openAuthDialog, setOpenAuthDialog] = useState(false);
 
   // Check authentication status on mount
   useEffect(() => {
@@ -77,6 +84,11 @@ export const AuthProvider = ({
     setError(null);
   }, []);
 
+  // Trigger login dialog
+  const triggerLogin = useCallback(() => {
+    setOpenAuthDialog(true);
+  }, []);
+
   // Login with password
   const login = useCallback(async (username: string, password: string) => {
     setIsLoading(true);
@@ -84,6 +96,7 @@ export const AuthProvider = ({
       const response = await AuthService.loginWithPassword(username, password);
       setUser(response.data.user);
       setError(null);
+      setOpenAuthDialog(false);
       return response;
     } catch (err: any) {
       const errorMessage =
@@ -106,6 +119,7 @@ export const AuthProvider = ({
         );
         setUser(response.data.user);
         setError(null);
+        setOpenAuthDialog(false);
         return response;
       } catch (err: any) {
         const errorMessage =
@@ -126,6 +140,7 @@ export const AuthProvider = ({
       const response = await AuthService.register(username, password);
       setUser(response.data.user);
       setError(null);
+      setOpenAuthDialog(false);
       return response;
     } catch (err: any) {
       const errorMessage =
@@ -164,6 +179,9 @@ export const AuthProvider = ({
         logout,
         error,
         clearError,
+        triggerLogin,
+        openAuthDialog,
+        setOpenAuthDialog,
       },
     },
     children,

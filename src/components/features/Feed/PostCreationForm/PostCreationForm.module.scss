@@ -1,213 +1,402 @@
 @use "../../../../styles/variables" as *;
 @use "../../../../styles/mixins" as *;
+@use "sass:color";
 
 .postForm {
   @include flex-column;
   gap: $space-4;
-}
-
-.formHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: $space-3;
-
-  @include media-breakpoint-down(sm) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-.privacyToggle {
-  display: flex;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-md;
-  overflow: hidden;
-}
-
-.privacyButton {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  padding: $space-2 $space-3;
-  border: none;
-  background-color: transparent;
-  color: $neutral-dark;
-  font-size: 1.4rem;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: $neutral-light;
-  }
-
-  &.active {
-    background-color: $neutral-light;
-    color: $text-color;
-    font-weight: $font-weight-semibold;
-  }
-
-  &:first-child {
-    border-right: 1px solid $border-color;
-  }
-}
-
-.triggerWarningToggle {
-  display: flex;
-  align-items: center;
-}
-
-.toggleLabel {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  gap: $space-2;
-}
-
-.toggleCheckbox {
-  display: none;
-
-  &:checked + .toggleSwitch {
-    background-color: $warning;
-
-    &:before {
-      transform: translateX(18px);
-    }
-  }
-}
-
-.toggleSwitch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 22px;
-  background-color: $neutral-mid;
-  border-radius: 20px;
-  transition: all 0.3s;
-
-  &:before {
-    content: "";
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    top: 2px;
-    left: 2px;
-    background-color: white;
-    transition: all 0.3s;
-  }
-}
-
-.toggleText {
-  display: flex;
-  align-items: center;
-  gap: $space-1;
-  font-size: 1.4rem;
-  color: $neutral-dark;
-
-  svg {
-    color: $warning;
-  }
-}
-
-.triggerWarningInput {
-  margin-top: -$space-2;
-}
-
-.contentArea {
   position: relative;
 }
 
-.textarea {
+// Form group with better spacing
+.formGroup {
+  @include flex-column;
+  gap: $space-2;
+  position: relative;
+}
+
+// Clean, modern textarea
+.contentInput {
   width: 100%;
-  min-height: 15rem;
-  padding: $space-3;
+  min-height: 16rem;
+  padding: $space-4;
   border: 1px solid $border-color;
-  border-radius: $border-radius-md;
+  border-radius: $border-radius-sm;
   font-family: $font-primary;
   font-size: 1.6rem;
   line-height: 1.6;
   color: $text-color;
   resize: vertical;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  background-color: $surface-color;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: color.adjust($primary, $alpha: -0.5);
+  }
 
   &:focus {
     outline: none;
     border-color: $primary;
-    box-shadow: 0 0 0 2px rgba($primary, 0.2);
+    box-shadow: 0 0 0 2px rgba($primary, 0.1);
   }
 
   &::placeholder {
     color: $neutral-mid;
   }
-}
 
-.charCounter {
-  position: absolute;
-  bottom: $space-2;
-  right: $space-3;
-  font-size: 1.3rem;
-  color: $neutral-dark;
-
-  .warning {
-    color: $warning;
+  &.hasError {
+    border-color: $error;
+    animation: subtle-shake 0.3s ease;
   }
 }
 
-.tagsSection {
-  @include flex-column;
-  gap: $space-3;
-}
-
-.tagsHeader {
+// Error message with icon
+.errorMessage {
   display: flex;
   align-items: center;
   gap: $space-2;
-  color: $neutral-dark;
+  color: $error;
+  font-size: 1.3rem;
+  margin-top: $space-1;
+
+  svg {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+}
+
+// Character counter with icon
+.charCounter {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  position: absolute;
+  bottom: $space-3;
+  right: $space-3;
+  font-size: 1.3rem;
+  color: $neutral-mid;
+  background-color: rgba($surface-color, 0.8);
+  padding: $space-1 $space-2;
+  border-radius: $border-radius-sm;
+
+  svg {
+    color: $primary;
+    font-size: 1.4rem;
+  }
+}
+
+// Form options section
+.formOptions {
+  @include flex-column;
+  gap: $space-4;
+  padding: $space-4 0;
+  border-top: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  margin-bottom: $space-4;
+}
+
+// Modern toggle sections
+.toggleSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-2 0;
+}
+
+// Toggle label with icon
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-weight: $font-weight-medium;
+  color: $text-color;
   font-size: 1.5rem;
 
   svg {
-    color: $accent;
+    color: $primary;
+    font-size: 1.6rem;
   }
 }
 
-.errorMessage {
+// Modern toggle switch
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 6rem;
+  height: 3rem;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+
+    &:checked + .slider {
+      background-color: $primary;
+
+      &:before {
+        transform: translateX(3rem);
+      }
+    }
+
+    &:focus + .slider {
+      box-shadow: 0 0 1px $primary;
+    }
+  }
+}
+
+// Slider design
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $neutral-mid;
+  transition: 0.3s;
+  border-radius: 3.4rem;
+
+  &:before {
+    position: absolute;
+    content: "";
+    height: 2.4rem;
+    width: 2.4rem;
+    left: 0.3rem;
+    bottom: 0.3rem;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+  }
+}
+
+// Toggle icon inside slider
+.toggleIcon {
+  position: absolute;
+  color: white;
+  font-size: 1.2rem;
+  // For anonymous icon (left side)
+  left: 0.8rem;
+  top: 0.9rem;
+  z-index: 1;
+
+  // For public icon (right side)
+  &.right {
+    left: auto;
+    right: 0.8rem;
+  }
+}
+
+// Trigger warning group with animation
+.triggerWarningGroup {
+  animation: slide-down 0.3s ease;
+  margin-top: $space-2;
+}
+
+// Trigger warning input
+.triggerWarningInput {
+  width: 100%;
   padding: $space-3;
+  border: 1px solid rgba($warning, 0.3);
   border-radius: $border-radius-sm;
-  background-color: rgba($error, 0.1);
-  border-left: 3px solid $error;
+  font-size: 1.5rem;
+  background-color: rgba($warning, 0.05);
 
-  p {
-    color: $error;
-    font-size: 1.5rem;
+  &:focus {
+    outline: none;
+    border-color: $warning;
+    box-shadow: 0 0 0 2px rgba($warning, 0.1);
+  }
+
+  &.hasError {
+    border-color: $error;
   }
 }
 
+// Tags section
+.tagsSection {
+  @include flex-column;
+  gap: $space-3;
+  margin-top: $space-2;
+}
+
+// Tags header with icon
+.tagsSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: 1.5rem;
+  color: $text-color;
+  font-weight: $font-weight-medium;
+
+  svg {
+    color: $accent;
+    font-size: 1.6rem;
+  }
+}
+
+// Privacy indicator
+.privacyIndicator {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: 1.4rem;
+  color: $neutral-dark;
+  background-color: rgba($neutral-light, 0.5);
+  padding: $space-2 $space-3;
+  border-radius: $border-radius-sm;
+  margin-bottom: $space-2;
+
+  .lockIcon {
+    font-size: 1.5rem;
+    color: $primary;
+  }
+}
+
+// Form actions
 .formActions {
   display: flex;
   justify-content: flex-end;
-  margin-top: $space-2;
+  margin-top: $space-3;
+
+  button {
+    // Reduced min-width for better proportions
+    min-width: 10rem;
+    padding: $space-2 $space-3;
+    border-radius: $border-radius-sm;
+    background: linear-gradient(
+      135deg,
+      $primary,
+      color.adjust($primary, $lightness: -7%)
+    );
+    color: white;
+    font-weight: $font-weight-medium;
+    // Slightly smaller font size
+    font-size: 1.4rem;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+    transition: all 0.25s ease;
+    // Reduced shadow size
+    box-shadow: 0 1px 4px rgba($primary, 0.25);
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba($primary, 0.3);
+      background: linear-gradient(
+        135deg,
+        color.adjust($primary, $lightness: 3%),
+        $primary
+      );
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba($primary, 0.2);
+    }
+
+    svg {
+      // Smaller icon size
+      font-size: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover svg {
+      transform: translateX(2px);
+    }
+
+    // Subtle highlight effect
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover::after {
+      opacity: 1;
+    }
+
+    // Loading state
+    &:disabled {
+      background: color.adjust($neutral-mid, $lightness: 10%);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
 
   @include media-breakpoint-down(sm) {
-    justify-content: center;
+    width: 100%;
+
+    button {
+      width: 100%;
+    }
   }
 }
 
-.submitButton {
-  @include button-primary;
-  // padding: $space-3 $space-5;
-  // min-width: 18rem;
+// Animations
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-  &:disabled {
-    background-color: $neutral-mid;
-    cursor: not-allowed;
+@keyframes subtle-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
 
-    &:hover {
-      background-color: $neutral-mid;
+// Responsive adjustments
+@include media-breakpoint-down(sm) {
+  .contentInput {
+    padding: $space-3;
+    min-height: 14rem;
+  }
+
+  .charCounter {
+    bottom: $space-2;
+    right: $space-2;
+  }
+
+  .toggleSection {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-2;
+
+    .toggleSwitch {
+      margin-left: $space-5;
+    }
+  }
+
+  .formActions {
+    button {
+      width: 100%;
     }
   }
 }

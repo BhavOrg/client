@@ -1,5 +1,5 @@
 // src/components/common/TagSelector/TagSelector.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { FaPlus, FaTimes, FaSearch } from "react-icons/fa";
 import {
   fetchTags,
@@ -12,7 +12,7 @@ import styles from "./TagSelector.module.scss";
 interface TagSelectorProps {
   selectedTags: Tag[];
   onChange: (tags: Tag[]) => void;
-  availableTags?: Tag[];
+  availableTags?: Tag[] | null;
   maxTags?: number;
   showPopular?: boolean;
   allowCreation?: boolean;
@@ -26,48 +26,77 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   showPopular = true,
   allowCreation = true,
 }) => {
-  const [availableTags, setAvailableTags] = useState<Tag[]>(propTags || []);
+  // Ensure availableTags is always an array
+  const [availableTags, setAvailableTags] = useState<Tag[]>(() =>
+    Array.isArray(propTags) ? propTags : [],
+  );
   const [popularTags, setPopularTags] = useState<Tag[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingTag, setIsCreatingTag] = useState(false);
   const [newTagName, setNewTagName] = useState("");
 
+  // Sync availableTags with prop changes
   useEffect(() => {
-    if (propTags) {
+    if (Array.isArray(propTags)) {
       setAvailableTags(propTags);
-      return;
     }
-
-    const loadTags = async () => {
-      try {
-        setIsLoading(true);
-        const tags = await fetchTags();
-        setAvailableTags(tags);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Failed to load tags:", error);
-        setIsLoading(false);
-      }
-    };
-
-    loadTags();
   }, [propTags]);
 
+  // Fetch tags if not provided
+  useEffect(() => {
+    if (!propTags) {
+      const loadTags = async () => {
+        try {
+          setIsLoading(true);
+          const tags = await fetchTags();
+          // Ensure tags is an array
+          setAvailableTags(Array.isArray(tags) ? tags : []);
+          setIsLoading(false);
+        } catch (error) {
+          console.error("Failed to load tags:", error);
+          setIsLoading(false);
+          setAvailableTags([]);
+        }
+      };
+
+      loadTags();
+    }
+  }, [propTags]);
+
+  // Fetch popular tags
   useEffect(() => {
     if (showPopular) {
       const loadPopularTags = async () => {
         try {
           const tags = await fetchPopularTags(10);
-          setPopularTags(tags);
+          // Ensure tags is an array
+          setPopularTags(Array.isArray(tags) ? tags : []);
         } catch (error) {
           console.error("Failed to load popular tags:", error);
+          setPopularTags([]);
         }
       };
 
       loadPopularTags();
     }
   }, [showPopular]);
+
+  // Memoized filtered tags to prevent unnecessary re-renders
+  const filteredTags = useMemo(() => {
+    // Ensure availableTags is an array and use safe filtering
+    const safeAvailableTags = Array.isArray(availableTags) ? availableTags : [];
+
+    return safeAvailableTags
+      .filter(
+        (tag) =>
+          tag &&
+          tag.name &&
+          tag.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          !selectedTags.some((t) => t.id === tag.id),
+      )
+      .slice(0, 10); // Limit to 10 results for better UX
+  }, [availableTags, searchTerm, selectedTags]);
 
   const handleTagSelect = (tag: Tag) => {
     if (selectedTags.length >= maxTags) return;
@@ -92,28 +121,35 @@ const TagSelector: React.FC<TagSelectorProps> = ({
 
     try {
       const createdTag = await createTag(newTagName.trim());
-      setAvailableTags([...availableTags, createdTag]);
-      handleTagSelect(createdTag);
-      setNewTagName("");
-      setIsCreatingTag(false);
+
+      // Ensure createdTag is a valid Tag object
+      if (createdTag && createdTag.id && createdTag.name) {
+        // Update available tags and select the new tag
+        setAvailableTags((prev) => [...prev, createdTag]);
+        handleTagSelect(createdTag);
+
+        // Reset creation state
+        setNewTagName("");
+        setIsCreatingTag(false);
+      }
     } catch (error) {
       console.error("Failed to create tag:", error);
     }
   };
 
-  const filteredTags = availableTags
-    .filter(
-      (tag) =>
-        tag.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !selectedTags.some((t) => t.id === tag.id),
-    )
-    .slice(0, 10); // Limit to 10 results for better UX
-
+  // Determine if create tag option should be shown
   const showCreateOption =
     allowCreation &&
     searchTerm.trim() !== "" &&
-    !availableTags.some(
-      (tag) => tag.name.toLowerCase() === searchTerm.toLowerCase(),
+    // Ensure safe array checking
+    !(
+      Array.isArray(availableTags) &&
+      availableTags.some(
+        (tag) =>
+          tag &&
+          tag.name &&
+          tag.name.toLowerCase() === searchTerm.toLowerCase(),
+      )
     ) &&
     !isCreatingTag;
 

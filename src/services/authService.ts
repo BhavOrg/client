@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
 const API_URL = "/api";
 
@@ -45,8 +45,17 @@ interface AuthResponse {
   };
 }
 
+// Type for generic API responses
+interface ApiResponse<T> {
+  status: string;
+  message: string;
+  data: {
+    [key: string]: T;
+  };
+}
+
 // Create axios instance with auth header
-const authAxios = axios.create({
+const authAxios: AxiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
@@ -167,6 +176,9 @@ const AuthService = {
     const token = localStorage.getItem("token");
     return !!token;
   },
+
+  // Expose the authenticated axios instance
+  authAxios,
 };
 
 export default AuthService;
