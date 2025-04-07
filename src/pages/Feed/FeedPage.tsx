@@ -30,13 +30,18 @@ const FeedPage: React.FC = () => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [createPostError, setCreatePostError] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastPostElementRef = useRef<HTMLDivElement | null>(null);
 
   // Fetch posts on component mount and when dependencies change
   useEffect(() => {
-    setLoading(true);
+    if (page === 1) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
     setError(null);
 
     const fetchFeedData = async () => {
@@ -52,9 +57,11 @@ const FeedPage: React.FC = () => {
 
         setHasMore(response.hasNextPage);
         setLoading(false);
+        setLoadingMore(false);
       } catch (err) {
         setError("Failed to load posts. Please try again later.");
         setLoading(false);
+        setLoadingMore(false);
       }
     };
 
@@ -63,26 +70,36 @@ const FeedPage: React.FC = () => {
 
   // Setup intersection observer for infinite scrolling
   useEffect(() => {
-    if (loading) return;
+    if (loading || !hasMore) return;
 
+    // Disconnect previous observer
     if (observer.current) observer.current.disconnect();
 
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasMore) {
-        setPage((prevPage) => prevPage + 1);
-      }
-    });
+    // Create new observer
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        // If the last element is visible and there's more content to load
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      },
+      {
+        rootMargin: "100px", // Start loading before the element is in view
+      },
+    );
 
+    // Observe the last post element
     if (lastPostElementRef.current) {
       observer.current.observe(lastPostElementRef.current);
     }
 
+    // Cleanup
     return () => {
       if (observer.current) {
         observer.current.disconnect();
       }
     };
-  }, [loading, hasMore]);
+  }, [loading, loadingMore, hasMore, posts]);
 
   const handleRefresh = () => {
     setPage(1);
@@ -179,6 +196,12 @@ const FeedPage: React.FC = () => {
     }
   }, [createPostError]);
 
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
   return (
     <div className={styles.postsContainer}>
       {error && (
@@ -223,13 +246,40 @@ const FeedPage: React.FC = () => {
         </>
       )}
 
+      {/* Loading indicators */}
       {loading && (
         <div className={styles.loaderContainer}>
           <Loader />
         </div>
       )}
 
-      {/* Authentication Error Modal */}
+      {loadingMore && !loading && (
+        <div className={styles.loadMoreContainer}>
+          <Loader />
+          <p>Loading more posts...</p>
+        </div>
+      )}
+
+      {/* Manual load more button as fallback */}
+      {!loading && !loadingMore && hasMore && (
+        <div className={styles.loadMoreContainer}>
+          <Button onClick={handleLoadMore} className={styles.loadMoreButton}>
+            Load More Posts
+          </Button>
+        </div>
+      )}
+
+      {/* End of feed message */}
+      {!loading && !loadingMore && !hasMore && posts.length > 0 && (
+        <div className={styles.endOfFeed}>
+          <p>You've reached the end of the feed</p>
+          <Button onClick={handleRefresh} className={styles.refreshButton}>
+            Refresh Feed
+          </Button>
+        </div>
+      )}
+
+      {/* Authentication Error Message */}
       {createPostError && (
         <div className={styles.createPostErrorBanner}>
           <p>{createPostError}</p>

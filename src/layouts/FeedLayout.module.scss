@@ -4,11 +4,12 @@
 
 .appWrapper {
   background-color: #f9fafb;
-  max-height: 100vh;
+  height: 100vh; /* Full viewport height */
   display: flex;
   flex-direction: column;
   position: relative;
-  margin-top: 1rem;
+  margin-top: 1.2rem;
+  overflow: hidden; /* Prevent overall page scrolling */
 }
 
 .headerBackground {
@@ -70,58 +71,31 @@
   > nav {
     width: 120rem; // Exactly 1200px
     border-radius: $border-radius-md;
-    background-color: rgba($surface-color, 1.97);
-    box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.15);
-  }
-}
-
-.feedLayout {
-  width: 120rem; // Exactly 1200px to match navbar
-  margin: 0 auto 4rem;
-  display: grid;
-  grid-template-columns: 22rem minmax(0, 1fr) 26rem; // Three-column layout
-  gap: $space-4;
-  position: relative;
-  z-index: 1; // Ensure content appears above background
-
-  @include media-breakpoint-down(lg) {
-    width: 100%;
-    padding: 0 $space-3;
-    grid-template-columns: 20rem minmax(0, 1fr) 24rem;
-  }
-
-  @include media-breakpoint-down(md) {
-    grid-template-columns: 1fr;
-    gap: $space-4;
-  }
-}
-
-.navbarContainer {
-  position: sticky;
-  top: 1.2rem;
-  z-index: 100;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2rem;
-
-  // Make the navbar wrapper exactly 1200px
-  > nav {
-    width: 120rem; // Exactly 1200px
-    border-radius: $border-radius-md;
     background-color: rgba($surface-color, 0.97);
     backdrop-filter: blur(10px);
     @include shadow-md;
   }
+
+  @include media-breakpoint-down(lg) {
+    padding: 0 $space-3;
+
+    > nav {
+      width: 100%;
+    }
+  }
 }
+
 .feedLayout {
   width: 120rem; // Exactly 1200px to match navbar
-  margin: 0 auto 4rem;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 22rem minmax(0, 1fr) 26rem; // Three-column layout
   gap: $space-4;
   position: relative;
   z-index: 1; // Ensure content appears above background
+  flex: 1;
+  overflow: hidden; /* Prevent overall layout from scrolling */
+  max-height: calc(100vh - 12rem); /* Account for navbar and margins */
 
   @include media-breakpoint-down(lg) {
     width: 100%;
@@ -137,6 +111,9 @@
 
 .leftSidebar,
 .rightSidebar {
+  overflow-y: auto; /* Allow scrolling if needed */
+  max-height: calc(100vh - 12rem); /* Match the .feedLayout max-height */
+
   @include media-breakpoint-down(md) {
     display: none; // Hide sidebars on mobile
   }
@@ -144,7 +121,7 @@
 
 .sidebarSticky {
   position: sticky;
-  top: 8rem; // Position below navbar with some spacing
+  top: 0; /* Stick to the top of the sidebar */
   background-color: $surface-color;
   border-radius: $border-radius-md;
   padding: $space-4;
@@ -163,8 +140,8 @@
   .avatarPlaceholder {
     width: 7rem;
     height: 7rem;
-    background-color: $neutral-light; // Using your neutral light color
-    color: $neutral-dark; // Using your neutral dark color
+    background-color: $neutral-light;
+    color: $neutral-dark;
     border-radius: 50%;
     margin: 0 auto $space-3;
     display: flex;
@@ -172,7 +149,7 @@
     justify-content: center;
     font-size: 3rem;
     position: relative;
-    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.05); // Very subtle shadow
+    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.05);
 
     &::after {
       content: "👤";
@@ -258,15 +235,8 @@
 .mainContent {
   display: flex;
   flex-direction: column;
-  overflow: visible;
-
-  &::before {
-    content: "";
-    display: block;
-    height: 0.1rem;
-    width: 100%;
-    margin-bottom: -0.1rem;
-  }
+  overflow: hidden; /* Contain the scroll to this element */
+  max-height: calc(100vh - 12rem); /* Match the .feedLayout max-height */
 }
 
 // Facebook-style input field
@@ -276,6 +246,7 @@
   padding: $space-4;
   @include shadow-md;
   margin-bottom: $space-4;
+  flex-shrink: 0; /* Prevent this from shrinking */
 }
 
 .createPostInput {
@@ -313,7 +284,7 @@
   width: 100%;
   padding: $space-3;
   border: 1px solid $neutral-light;
-  border-radius: 3rem;
+  border-radius: $border-radius-md;
   font-size: 1.5rem;
   background-color: $neutral-light;
   transition: all 0.2s ease;
@@ -360,7 +331,26 @@
   border-radius: $border-radius-md;
   padding: $space-4;
   @include shadow-md;
-  min-height: 60vh;
+  overflow-y: auto; /* This enables scrolling for the feed content */
+  flex: 1; /* Take up remaining space */
+
+  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: $neutral-mid $neutral-light;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $neutral-light;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $neutral-mid;
+    border-radius: 4px;
+  }
 
   @include media-breakpoint-down(sm) {
     padding: $space-3;
@@ -481,7 +471,7 @@
   display: inline-block;
   padding: $space-1 $space-2;
   background-color: $neutral-light;
-  border-radius: $border-radius-lg;
+  border-radius: $border-radius-md;
   font-size: 1.3rem;
   color: $neutral-dark;
   cursor: pointer;
@@ -506,6 +496,11 @@
 
   .feedLayout {
     margin-top: 1rem;
+    max-height: calc(100vh - 8rem); /* Adjust for smaller screens */
+  }
+
+  .mainContent {
+    max-height: calc(100vh - 8rem); /* Adjust for smaller screens */
   }
 
   // Mobile menu toggle

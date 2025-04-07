@@ -151,7 +151,7 @@ const ContactPage: React.FC = () => {
                     <div className={styles.contactText}>
                       <h3>Visit Us</h3>
                       <p>123 Wellness Street, Suite 100</p>
-                      <p>San Francisco, CA 94107</p>
+                      <p>Waterloo, CA 94107</p>
                     </div>
                   </div>
                 </div>

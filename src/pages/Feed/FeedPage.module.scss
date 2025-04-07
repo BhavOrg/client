@@ -51,7 +51,99 @@
   padding: $space-4 0;
 }
 
+.loadMoreContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4 0;
+
+  p {
+    margin-top: $space-2;
+    color: $neutral-dark;
+    font-size: 1.4rem;
+  }
+}
+
+.loadMoreButton {
+  min-width: 200px;
+  background-color: rgba($primary, 0.1) !important;
+  color: $primary !important;
+  border: 1px solid $primary !important;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba($primary, 0.2) !important;
+  }
+}
+
+.endOfFeed {
+  text-align: center;
+  padding: $space-6 0;
+  border-top: 1px solid $neutral-light;
+  margin-top: $space-4;
+
+  p {
+    color: $neutral-dark;
+    margin-bottom: $space-3;
+    font-style: italic;
+  }
+
+  .refreshButton {
+    background-color: $neutral-light !important;
+    color: $text-color !important;
+
+    &:hover {
+      background-color: rgba($primary, 0.1) !important;
+      color: $primary !important;
+    }
+  }
+}
+
 .createPostModal {
   width: 100%;
   max-width: 60rem;
+}
+
+.createPostErrorBanner {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba($error, 0.9);
+  color: white;
+  padding: $space-3 $space-5;
+  border-radius: $border-radius-md;
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: slideUp 0.3s ease;
+
+  p {
+    margin: 0;
+  }
+
+  button {
+    background-color: white !important;
+    color: $error !important;
+    padding: $space-1 $space-3 !important;
+    font-size: 1.4rem !important;
+
+    &:hover {
+      background-color: rgba(white, 0.9) !important;
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }

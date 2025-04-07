@@ -35,6 +35,7 @@ const FeedLayout: React.FC = () => {
         <div className={styles.shapeRight}></div>
         <div className={styles.overlay}></div>
       </div>
+
       <div className={styles.navbarContainer}>
         <Navbar />
       </div>
