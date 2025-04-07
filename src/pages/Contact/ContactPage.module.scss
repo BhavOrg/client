@@ -1,0 +1,465 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+@use "sass:color";
+
+.contactPageWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb;
+  margin-top: 1.2rem;
+}
+
+/* Navbar positioning override */
+.navbarContainer {
+  position: sticky;
+  top: 1.2rem;
+  z-index: 100;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+
+  > nav {
+    width: 120rem; // Exactly 1200px
+    border-radius: $border-radius-md;
+    background-color: rgba($surface-color, 0.97);
+    box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.15);
+  }
+
+  @include media-breakpoint-down(lg) {
+    padding: 0 $space-3;
+
+    > nav {
+      width: 100%;
+    }
+  }
+}
+
+.contactMain {
+  flex: 1;
+  margin-bottom: $space-8;
+}
+
+/* Contact Header */
+.contactHeader {
+  background: linear-gradient(
+    140deg,
+    rgba($primary, 0.08) 0%,
+    rgba($secondary, 0.08) 100%
+  );
+  padding: $space-8 0;
+  margin-bottom: $space-6;
+  position: relative;
+  overflow: hidden;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba($primary, 0.05);
+    animation: pulse 15s infinite alternate ease-in-out;
+  }
+
+  &::before {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: 5%;
+  }
+
+  &::after {
+    width: 400px;
+    height: 400px;
+    bottom: -200px;
+    left: 3%;
+    background-color: rgba($secondary, 0.05);
+    animation-delay: 2s;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.headerContent {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+
+  h1 {
+    font-size: 4.2rem;
+    font-weight: 700;
+    margin-bottom: $space-2;
+    background: linear-gradient(135deg, $primary, $secondary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    @include media-breakpoint-down(md) {
+      font-size: 3.6rem;
+    }
+  }
+
+  p {
+    font-size: 1.8rem;
+    color: $neutral-dark;
+    max-width: 700px;
+    margin: 0 auto;
+
+    @include media-breakpoint-down(md) {
+      font-size: 1.6rem;
+    }
+  }
+}
+
+/* Contact Container */
+.contactContainer {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: $space-6;
+  margin-bottom: $space-10;
+
+  @include media-breakpoint-down(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Contact Info Section */
+.contactInfoSection {
+  @include media-breakpoint-down(md) {
+    order: 2;
+  }
+}
+
+.infoCard {
+  background-color: $surface-color;
+  border-radius: $border-radius-md;
+  padding: $space-6;
+  height: 100%;
+  @include shadow-md;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: rgba($primary, 0.05);
+    z-index: 0;
+  }
+
+  h2 {
+    position: relative;
+    z-index: 1;
+    font-size: 2.8rem;
+    margin-bottom: $space-3;
+    color: $text-color;
+  }
+
+  > p {
+    position: relative;
+    z-index: 1;
+    font-size: 1.6rem;
+    color: $neutral-dark;
+    margin-bottom: $space-5;
+  }
+}
+
+.contactDetails {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+  margin-bottom: $space-6;
+}
+
+.contactMethod {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+}
+
+.iconWrapper {
+  width: 4.8rem;
+  height: 4.8rem;
+  background-color: rgba($primary, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $primary;
+  font-size: 2rem;
+}
+
+.contactText {
+  h3 {
+    font-size: 1.8rem;
+    margin-bottom: $space-1;
+    color: $text-color;
+  }
+
+  p {
+    font-size: 1.5rem;
+    color: $neutral-dark;
+    margin: 0;
+    line-height: 1.5;
+
+    &:first-of-type {
+      font-weight: $font-weight-medium;
+    }
+  }
+}
+
+.privacyNote {
+  position: relative;
+  z-index: 1;
+  background-color: rgba($neutral-light, 0.7);
+  padding: $space-3;
+  border-radius: $border-radius-md;
+  border-left: 3px solid $secondary;
+
+  p {
+    font-size: 1.4rem;
+    color: $neutral-dark;
+    margin: 0;
+  }
+}
+
+/* Contact Form Section */
+.contactFormSection {
+  @include media-breakpoint-down(md) {
+    order: 1;
+  }
+}
+
+.formCard {
+  background-color: $surface-color;
+  border-radius: $border-radius-md;
+  padding: $space-6;
+  @include shadow-md;
+
+  h2 {
+    font-size: 2.8rem;
+    margin-bottom: $space-4;
+    color: $text-color;
+  }
+}
+
+.reasonSelector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-3;
+  margin-bottom: $space-4;
+
+  @include media-breakpoint-down(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include media-breakpoint-down(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reasonButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $space-3 $space-2;
+  background-color: $neutral-light;
+  border: 2px solid transparent;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba($primary, 0.1);
+  }
+
+  &.active {
+    border-color: $primary;
+    background-color: rgba($primary, 0.1);
+  }
+}
+
+.reasonIcon {
+  font-size: 2.4rem;
+  color: $primary;
+  margin-bottom: $space-2;
+}
+
+.reasonText {
+  font-size: 1.4rem;
+  font-weight: $font-weight-medium;
+  color: $text-color;
+  text-align: center;
+}
+
+.selectedReasonDescription {
+  background-color: rgba($neutral-light, 0.7);
+  padding: $space-3;
+  border-radius: $border-radius-md;
+  margin-bottom: $space-5;
+
+  p {
+    font-size: 1.4rem;
+    color: $neutral-dark;
+    margin: 0;
+  }
+}
+
+.contactForm {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  label {
+    font-size: 1.5rem;
+    font-weight: $font-weight-medium;
+    color: $text-color;
+  }
+
+  input,
+  textarea {
+    padding: $space-3 $space-4;
+    border: 1px solid $neutral-light;
+    border-radius: $border-radius-md;
+    font-size: 1.5rem;
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 2px rgba($primary, 0.2);
+    }
+
+    &::placeholder {
+      color: $neutral-mid;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+}
+
+.formActions {
+  margin-top: $space-2;
+}
+
+.submitButton {
+  min-width: 160px;
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.successMessage {
+  background-color: rgba($success, 0.1);
+  padding: $space-6;
+  border-radius: $border-radius-md;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+
+  svg {
+    font-size: 4rem;
+    color: $success;
+    margin-bottom: $space-3;
+  }
+
+  h3 {
+    font-size: 2rem;
+    color: $text-color;
+    margin-bottom: $space-2;
+  }
+
+  p {
+    font-size: 1.5rem;
+    color: $neutral-dark;
+    margin: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* FAQ Section */
+.faqSection {
+  background-color: $surface-color;
+  border-radius: $border-radius-md;
+  padding: $space-6;
+  margin-bottom: $space-8;
+  @include shadow-md;
+
+  h2 {
+    font-size: 2.8rem;
+    margin-bottom: $space-6;
+    color: $text-color;
+    text-align: center;
+  }
+}
+
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-5;
+
+  @include media-breakpoint-down(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.faqItem {
+  h3 {
+    font-size: 1.8rem;
+    margin-bottom: $space-2;
+    color: $text-color;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "❑";
+      display: inline-block;
+      margin-right: $space-2;
+      color: $primary;
+      font-size: 1.4rem;
+    }
+  }
+
+  p {
+    font-size: 1.5rem;
+    color: $neutral-dark;
+    line-height: 1.6;
+  }
+}

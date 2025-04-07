@@ -4,6 +4,8 @@ import FeedLayout from "../layouts/FeedLayout";
 import HomePage from "../pages/Home/Home";
 import FeedPage from "../pages/Feed/FeedPage";
 import CommunityPage from "../pages/Community/CommunityPage";
+import BlogPage from "../pages/Blog/BlogPage";
+import ContactPage from "../pages/Contact/ContactPage";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -33,7 +35,7 @@ export const router = createBrowserRouter([
       // Other public routes
       {
         path: "blogs",
-        element: <div>Blogs Page</div>,
+        element: <BlogPage />,
       },
       {
         path: "community",
@@ -41,7 +43,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "contact",
-        element: <div>Contact Page</div>,
+        element: <ContactPage />,
       },
       // Profile route with authentication
       {
